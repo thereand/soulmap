@@ -68,7 +68,7 @@ exports.main = async (event) => {
             page: `pagesTest/result/index?showOffer=true`,
             payload: {
               reportName: '你的灵魂星灵解读报告',
-              expireText: '12 小时后恢复原价',
+              completedAt: r.completedAt || (now - 24 * HOUR),
               offerText: '点击查看最终特惠 ¥5.9',
             },
           },
