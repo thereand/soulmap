@@ -1,0 +1,9 @@
+{
+  "name": "compare",
+  "version": "1.0.0",
+  "description": "灵魂星图 - 好友对比配对云函数",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

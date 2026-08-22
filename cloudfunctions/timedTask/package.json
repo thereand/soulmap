@@ -1,0 +1,9 @@
+{
+  "name": "timedTask",
+  "version": "1.0.0",
+  "description": "灵魂星图 - 定时任务：检测未付费用户并触发挽回",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

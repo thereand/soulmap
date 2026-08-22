@@ -1,0 +1,62 @@
+
+/**
+ * uni-app 全局 SCSS 变量
+ * 这些变量可以在任意页面/组件中直接使用，无需 @import
+ * 注意：此文件由 uni-app 自动加载
+ */
+
+/* ===== 主色调 ===== */
+$brand-primary: #6c3ce0;        /* 主紫色 */
+$brand-secondary: #1a0533;      /* 深紫导航栏 */
+$brand-dark: #0d0118;           /* 近黑背景 */
+
+/* ===== 强调色 ===== */
+$accent-gold: #ffd700;          /* 金色星光 */
+$accent-blue: #4fc3f7;          /* 能量蓝 */
+
+/* ===== 背景色 ===== */
+$bg-primary: #0d0118;
+$bg-secondary: #1a0533;
+$bg-card: rgba(108, 60, 224, 0.08);
+
+/* ===== 文字色 ===== */
+$text-primary: #ffffff;
+$text-secondary: rgba(255, 255, 255, 0.7);
+$text-muted: rgba(255, 255, 255, 0.4);
+
+/* ===== 圆角 ===== */
+$radius-sm: 8rpx;
+$radius-md: 16rpx;
+$radius-lg: 24rpx;
+$radius-xl: 32rpx;
+$radius-full: 999rpx;
+
+/* ===== 字号 ===== */
+$font-xs: 22rpx;
+$font-sm: 24rpx;
+$font-base: 28rpx;
+$font-md: 30rpx;
+$font-lg: 34rpx;
+$font-xl: 40rpx;
+$font-xxl: 48rpx;
+$font-title: 60rpx;
+$font-hero: 80rpx;
+
+/* ===== 间距 ===== */
+$spacing-xs: 8rpx;
+$spacing-sm: 16rpx;
+$spacing-md: 24rpx;
+$spacing-lg: 32rpx;
+$spacing-xl: 48rpx;
+$spacing-xxl: 64rpx;
+
+/* ===== uni-app 内置变量覆盖 ===== */
+$uni-primary: $brand-primary;
+$uni-success: #4caf50;
+$uni-warning: #ff9800;
+$uni-error: #f44336;
+$uni-text-color: $text-primary;
+$uni-text-color-grey: $text-secondary;
+$uni-bg-color: $bg-primary;
+$uni-border-color: rgba(255, 255, 255, 0.1);
+$uni-font-size-base: $font-base;

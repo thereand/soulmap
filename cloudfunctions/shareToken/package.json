@@ -1,0 +1,9 @@
+{
+  "name": "shareToken",
+  "version": "1.0.0",
+  "description": "灵魂星图 - 分享短链云函数",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

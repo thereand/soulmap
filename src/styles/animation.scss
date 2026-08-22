@@ -1,0 +1,267 @@
+/**
+ * 灵魂星图 - 动画样式集
+ * 包含：淡入淡出、滑入、缩放、粒子发光等 CSS 动画
+ */
+
+/* ===== 淡入淡出 ===== */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(40rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-40rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== 滑入动画 ===== */
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-100rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(100rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(100%);
+  }
+}
+
+/* ===== 缩放动画 ===== */
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes scaleOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  70% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* ===== 粒子/星光发光动画 ===== */
+@keyframes starGlow {
+  0%, 100% {
+    opacity: 0.3;
+    box-shadow: 0 0 8rpx rgba(255, 215, 0, 0.2);
+  }
+  50% {
+    opacity: 1;
+    box-shadow: 0 0 24rpx rgba(255, 215, 0, 0.6);
+  }
+}
+
+@keyframes twinkle {
+  0%, 100% {
+    opacity: 0.2;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20rpx);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+/* ===== 旋转动画 ===== */
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes rotateReverse {
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+/* ===== 进度条动画 ===== */
+@keyframes progressFill {
+  from {
+    width: 0%;
+  }
+}
+
+@keyframes progressPulse {
+  0%, 100% {
+    box-shadow: 0 0 8rpx rgba(108, 60, 224, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 20rpx rgba(108, 60, 224, 0.8);
+  }
+}
+
+/* ===== 工具类：可直接使用的动画 class ===== */
+.anim-fade-in {
+  animation: fadeIn 0.5s ease forwards;
+}
+
+.anim-fade-in-up {
+  animation: fadeInUp 0.6s ease forwards;
+}
+
+.anim-fade-in-down {
+  animation: fadeInDown 0.6s ease forwards;
+}
+
+.anim-slide-left {
+  animation: slideInLeft 0.5s ease forwards;
+}
+
+.anim-slide-right {
+  animation: slideInRight 0.5s ease forwards;
+}
+
+.anim-scale-in {
+  animation: scaleIn 0.4s ease forwards;
+}
+
+.anim-bounce-in {
+  animation: bounceIn 0.6s ease forwards;
+}
+
+.anim-pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.anim-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.anim-twinkle {
+  animation: twinkle 2s ease-in-out infinite;
+}
+
+.anim-star-glow {
+  animation: starGlow 2.5s ease-in-out infinite;
+}
+
+.anim-rotate {
+  animation: rotate 20s linear infinite;
+}
+
+/* 延迟工具类 */
+.anim-delay-1 { animation-delay: 0.1s; }
+.anim-delay-2 { animation-delay: 0.2s; }
+.anim-delay-3 { animation-delay: 0.3s; }
+.anim-delay-4 { animation-delay: 0.4s; }
+.anim-delay-5 { animation-delay: 0.5s; }
+.anim-delay-6 { animation-delay: 0.6s; }
+.anim-delay-7 { animation-delay: 0.7s; }
+.anim-delay-8 { animation-delay: 0.8s; }
+
+/* 初始隐藏（配合动画使用） */
+.anim-hidden {
+  opacity: 0;
+}

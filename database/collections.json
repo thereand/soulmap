@@ -1,0 +1,39 @@
+{
+  "collections": [
+    {
+      "name": "users",
+      "description": "用户表",
+      "indexes": [
+        { "fields": ["_openid"], "unique": true },
+        { "fields": ["createdAt"] },
+        { "fields": ["lastLoginAt"] }
+      ]
+    },
+    {
+      "name": "test_results",
+      "description": "测试结果表",
+      "indexes": [
+        { "fields": ["_openid"] },
+        { "fields": ["userId"] },
+        { "fields": ["sessionId"] },
+        { "fields": ["shareToken"], "unique": true },
+        { "fields": ["completedAt"] },
+        { "fields": ["userId", "completedAt"] }
+      ]
+    },
+    {
+      "name": "orders",
+      "description": "订单表",
+      "indexes": [
+        { "fields": ["_openid"] },
+        { "fields": ["userId"] },
+        { "fields": ["orderId"], "unique": true },
+        { "fields": ["resultId"] },
+        { "fields": ["status"] },
+        { "fields": ["transactionId"] },
+        { "fields": ["userId", "status"] },
+        { "fields": ["expireAt"] }
+      ]
+    }
+  ]
+}

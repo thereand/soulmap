@@ -1,0 +1,107 @@
+/**
+ * 灵魂星图 - 主题变量定义
+ * 深色星空主题：深紫 → 星空蓝渐变
+ */
+
+/* ===== 主色调 ===== */
+$color-primary: #6c3ce0;            /* 主紫色 - 品牌核心色 */
+$color-primary-light: #8b5cf6;      /* 浅紫 - 悬浮/激活态 */
+$color-primary-dark: #5021b6;       /* 深紫 - 按压态 */
+$color-secondary: #1a0533;          /* 深紫 - 导航栏/卡片背景 */
+$color-tertiary: #0d0118;           /* 近黑 - 页面背景 */
+
+/* ===== 强调色 ===== */
+$accent-gold: #ffd700;              /* 金色星光 - 高亮/奖励 */
+$accent-gold-light: #ffe44d;        /* 浅金 - 悬浮态 */
+$accent-gold-dark: #c7a600;         /* 深金 - 文字可读 */
+$accent-blue: #4fc3f7;              /* 能量蓝 - 信息/链接 */
+$accent-blue-light: #80d6ff;        /* 浅蓝 - 背景 */
+$accent-purple-glow: rgba(108, 60, 224, 0.4); /* 紫色发光 */
+
+/* ===== 背景色系统 ===== */
+$bg-primary: #0d0118;               /* 页面主背景 */
+$bg-secondary: #1a0533;             /* 二级背景/卡片 */
+$bg-card: rgba(108, 60, 224, 0.08); /* 卡片背景（半透明） */
+$bg-card-hover: rgba(108, 60, 224, 0.15); /* 卡片悬浮态 */
+$bg-overlay: rgba(13, 1, 24, 0.85); /* 遮罩层 */
+$bg-gradient-star: linear-gradient(
+  180deg,
+  #0d0118 0%,
+  #1a0533 50%,
+  #0d0118 100%
+); /* 星空渐变背景 */
+$bg-gradient-card: linear-gradient(
+  135deg,
+  rgba(108, 60, 224, 0.12) 0%,
+  rgba(26, 5, 51, 0.6) 100%
+); /* 卡片渐变背景 */
+
+/* ===== 文字色系 ===== */
+$text-primary: #ffffff;             /* 主文字 */
+$text-secondary: rgba(255, 255, 255, 0.7);  /* 次要文字 */
+$text-muted: rgba(255, 255, 255, 0.4);      /* 弱化文字 */
+$text-placeholder: rgba(255, 255, 255, 0.25); /* 占位符 */
+$text-gold: #ffd700;                /* 金色高亮文字 */
+$text-blue: #4fc3f7;                /* 蓝色信息文字 */
+
+/* ===== 间距系统（基于 8rpx 倍数） ===== */
+$spacing-2: 4rpx;
+$spacing-4: 8rpx;
+$spacing-8: 16rpx;
+$spacing-12: 24rpx;
+$spacing-16: 32rpx;
+$spacing-20: 40rpx;
+$spacing-24: 48rpx;
+$spacing-32: 64rpx;
+$spacing-40: 80rpx;
+$spacing-48: 96rpx;
+
+/* ===== 字号系统 ===== */
+$font-xs: 22rpx;
+$font-sm: 24rpx;
+$font-base: 28rpx;
+$font-md: 30rpx;
+$font-lg: 34rpx;
+$font-xl: 40rpx;
+$font-xxl: 48rpx;
+$font-title: 60rpx;
+$font-hero: 80rpx;
+
+/* ===== 圆角系统 ===== */
+$radius-sm: 8rpx;
+$radius-md: 16rpx;
+$radius-lg: 24rpx;
+$radius-xl: 32rpx;
+$radius-2xl: 48rpx;
+$radius-full: 999rpx;
+
+/* ===== 阴影系统 ===== */
+$shadow-sm: 0 4rpx 12rpx rgba(0, 0, 0, 0.3);
+$shadow-md: 0 8rpx 24rpx rgba(0, 0, 0, 0.4);
+$shadow-lg: 0 16rpx 48rpx rgba(0, 0, 0, 0.5);
+$shadow-glow-purple: 0 0 40rpx rgba(108, 60, 224, 0.4);
+$shadow-glow-gold: 0 0 40rpx rgba(255, 215, 0, 0.3);
+$shadow-glow-blue: 0 0 40rpx rgba(79, 195, 247, 0.3);
+
+/* ===== 过渡时间 ===== */
+$transition-fast: 0.15s ease;
+$transition-base: 0.3s ease;
+$transition-slow: 0.5s ease;
+$transition-bounce: 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+/* ===== Z-index 层级 ===== */
+$z-base: 1;
+$z-dropdown: 10;
+$z-sticky: 100;
+$z-fixed: 200;
+$z-modal-backdrop: 500;
+$z-modal: 600;
+$z-popup: 700;
+$z-toast: 1000;
+
+/* ===== H5 字号缩放 ===== */
+/* #ifdef H5 */
+:root {
+  --h5-font-scale: 1.15;
+}
+/* #endif */
