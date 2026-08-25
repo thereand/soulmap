@@ -215,11 +215,13 @@ import TimedOffer from '@/components/payment/TimedOffer.vue'
 import InviteBanner from '@/components/shared/InviteBanner.vue'
 import { useInvite } from '@/composables/useInvite'
 import { useABTest } from '@/composables/useABTest'
+import { useSubscribe } from '@/composables/useSubscribe'
 import { track, AnalyticsEvent, trackPageView } from '@/utils/analytics'
 
 const testStore = useTestStore()
 const invite = useInvite()
 const ab = useABTest()
+const subscribe = useSubscribe()
 
 /** 是否显示揭晓动画 */
 const showReveal = ref(true)
@@ -327,6 +329,19 @@ onMounted(() => {
       resultType: testStore.result?.personalityType || '',
       offerPrice: 9.9,
     })
+
+    // 高情绪点：揭晓完成 1.2 秒后弹出订阅授权
+    // 只在小程序端有效，H5 会静默 no-op；24 小时内已弹过一次则不再打扰
+    setTimeout(() => {
+      subscribe.requestSubscribe().then((r) => {
+        if (r.granted > 0) {
+          track(AnalyticsEvent.PAGE_VIEW, {
+            action: 'subscribe_granted',
+            count: r.granted,
+          })
+        }
+      })
+    }, 1200)
   }, REVEAL_DURATION)
 })
 
@@ -406,8 +421,10 @@ function handleInviteShare(payload: { inviteCode: string; title: string; path: s
     inviteCode: payload.inviteCode,
   })
   ab.trackConversion('invite_threshold_v1', 'invite_send')
-  // 小程序：由 onShareAppMessage 拿到路径；这里提示用户点右上角分享
+
+  // 邀请前拉起 friendDynamic 订阅（用户想被通知好友完成测试）
   // #ifdef MP-WEIXIN
+  subscribe.requestFriendDynamicOnly().catch(() => null)
   uni.showToast({
     title: '点击右上角「分享」发给好友',
     icon: 'none',

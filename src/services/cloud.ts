@@ -29,6 +29,7 @@ type CloudFunctionName =
   | 'timedTask'
   | 'getABReport'
   | 'trackEvents'
+  | 'recordSubscribeAuth'
 
 /**
  * 调用云函数（统一封装）
