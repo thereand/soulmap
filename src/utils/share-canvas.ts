@@ -302,7 +302,7 @@ function drawFooter(
   ctx.font = 'bold 32px sans-serif'
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
-  ctx.fillText('✦  来探索你的灵魂星图  ✦', width / 2, centerY)
+  ctx.fillText('✦  来探索你的宁好星图  ✦', width / 2, centerY)
 
   // 副文案
   ctx.fillStyle = 'rgba(255,255,255,0.5)'
@@ -451,5 +451,5 @@ export function drawPoster(
   ctx.font = 'bold 18px sans-serif'
   ctx.textAlign = 'center'
   ctx.fillStyle = 'rgba(255, 255, 255, 0.25)'
-  ctx.fillText('SOULMAP · 灵魂星图', width / 2, 40)
+  ctx.fillText('SOULMAP · 宁好星图', width / 2, 40)
 }

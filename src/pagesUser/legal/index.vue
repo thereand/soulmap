@@ -48,7 +48,7 @@
       <template v-else>
         <text class="legal-section-title">1. 服务概述</text>
         <text class="legal-text">
-          "灵魂星图"是一款趣味人格探索小程序，提供沉浸式故事化题目与人格类型解析。所有解析结果均基于您的答题选项进行算法计算，仅供娱乐参考。
+          "宁好星图"是一款趣味人格探索小程序，提供沉浸式故事化题目与人格类型解析。所有解析结果均基于您的答题选项进行算法计算，仅供娱乐参考。
         </text>
 
         <text class="legal-section-title">2. 使用规范</text>

@@ -18,7 +18,7 @@
         <view class="logo-ring" />
         <view class="logo-core" />
       </view>
-      <text class="brand-title">灵魂星图</text>
+      <text class="brand-title">宁好星图</text>
       <text class="brand-subtitle">探索你的灵魂星灵</text>
     </view>
 

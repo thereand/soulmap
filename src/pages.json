@@ -3,7 +3,7 @@
     {
       "path": "pages/index/index",
       "style": {
-        "navigationBarTitleText": "灵魂星图",
+        "navigationBarTitleText": "宁好星图",
         "navigationBarBackgroundColor": "#1a0533",
         "navigationBarTextStyle": "white",
         "backgroundColor": "#0d0118"
@@ -114,7 +114,7 @@
         {
           "path": "landing/index",
           "style": {
-            "navigationBarTitleText": "灵魂星图",
+            "navigationBarTitleText": "宁好星图",
             "navigationBarBackgroundColor": "#1a0533",
             "navigationBarTextStyle": "white",
             "backgroundColor": "#0d0118"
@@ -125,7 +125,7 @@
   ],
   "globalStyle": {
     "navigationBarTextStyle": "white",
-    "navigationBarTitleText": "灵魂星图",
+    "navigationBarTitleText": "宁好星图",
     "navigationBarBackgroundColor": "#1a0533",
     "backgroundColor": "#0d0118",
     "backgroundTextStyle": "light",

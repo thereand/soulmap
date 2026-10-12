@@ -23,7 +23,7 @@
       <!-- 顶部品牌标识 -->
       <view class="landing-brand">
         <text class="landing-brand__icon">✦</text>
-        <text class="landing-brand__name">灵魂星图</text>
+        <text class="landing-brand__name">宁好星图</text>
         <text class="landing-brand__sub">SOULMAP</text>
       </view>
 
@@ -100,7 +100,7 @@
 
       <!-- 底部装饰 -->
       <view class="landing-footer">
-        <text class="landing-footer__text">© 灵魂星图 SOULMAP</text>
+        <text class="landing-footer__text">© 宁好星图 SOULMAP</text>
       </view>
     </view>
   </view>
