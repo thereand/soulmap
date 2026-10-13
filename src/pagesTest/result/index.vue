@@ -210,6 +210,20 @@
 
       <!-- 底部操作区 -->
       <view class="result-footer">
+        <!-- 图鉴解锁提示 -->
+        <view v-if="newlyUnlockedCards.length > 0" class="atlas-unlock" @tap="goToAtlas">
+          <text class="atlas-unlock__icon">🏆</text>
+          <text class="atlas-unlock__text">解锁了 {{ newlyUnlockedCards.length }} 张新图鉴卡片</text>
+          <text class="atlas-unlock__arrow">查看 →</text>
+        </view>
+
+        <!-- 图鉴入口 -->
+        <view class="atlas-entry" @tap="goToAtlas">
+          <text class="atlas-entry__icon">📖</text>
+          <text class="atlas-entry__text">星灵图鉴</text>
+          <text class="atlas-entry__count">{{ atlas.unlockedCount.value }}/{{ atlas.totalCards.value }}</text>
+        </view>
+
         <view class="share-btn" @tap="handleShare">
           <text class="share-btn__icon">📤</text>
           <text class="share-btn__text">分享给好友</text>
@@ -222,6 +236,19 @@
       <!-- 底部安全距离 -->
       <view class="safe-bottom" />
     </scroll-view>
+
+    <!-- 分享海报弹窗 -->
+    <view v-if="showPoster && personalityData" class="poster-modal" @tap.self="handleClosePoster">
+      <view class="poster-modal__content">
+        <view class="poster-modal__close" @tap="handleClosePoster">
+          <text class="poster-modal__close-text">✕</text>
+        </view>
+        <SharePoster
+          :personality-type="personalityData"
+          :result-code="testResult?.personalityType || ''"
+        />
+      </view>
+    </view>
 
     <!-- 无结果时的提示 -->
     <view v-if="!showReveal && !personalityData" class="no-result">
@@ -245,21 +272,30 @@ import GuideComboCard from '@/components/result/GuideComboCard.vue'
 import GuideRadarChart from '@/components/result/GuideRadarChart.vue'
 import ZodiacFusionCard from '@/components/result/ZodiacFusionCard.vue'
 import JourneyStory from '@/components/result/JourneyStory.vue'
+import SharePoster from '@/components/result/SharePoster.vue'
 import PayWall from '@/components/payment/PayWall.vue'
 import TimedOffer from '@/components/payment/TimedOffer.vue'
 import InviteBanner from '@/components/shared/InviteBanner.vue'
 import { useInvite } from '@/composables/useInvite'
 import { useABTest } from '@/composables/useABTest'
 import { useSubscribe } from '@/composables/useSubscribe'
+import { useAtlas } from '@/composables/useAtlas'
 import { track, AnalyticsEvent, trackPageView } from '@/utils/analytics'
 
 const testStore = useTestStore()
 const invite = useInvite()
 const ab = useABTest()
 const subscribe = useSubscribe()
+const atlas = useAtlas()
+
+/** 新解锁的图鉴卡片 */
+const newlyUnlockedCards = ref<string[]>([])
 
 /** 是否显示揭晓动画 */
 const showReveal = ref(true)
+
+/** 是否显示分享海报弹窗 */
+const showPoster = ref(false)
 
 /** 揭晓动画持续时间(ms) */
 const REVEAL_DURATION = 2500
@@ -374,6 +410,22 @@ onLoad(() => {
     resultType: testStore.result?.personalityType || '',
   })
 
+  // 解锁星灵图鉴卡片
+  if (testStore.result) {
+    atlas.loadUnlocked()
+    const unlocked = atlas.unlockFromResult(
+      testStore.result.personalityType,
+      testStore.guideCombination?.id || '',
+    )
+    newlyUnlockedCards.value = unlocked
+    if (unlocked.length > 0) {
+      track(AnalyticsEvent.RESULT_VIEW, {
+        eventType: 'atlas_unlock',
+        cardIds: unlocked.join(','),
+      })
+    }
+  }
+
   // 如果用户是被邀请进入的，通知邀请人 +1
   invite.markInviteeCompleted().catch(() => null)
 })
@@ -469,11 +521,12 @@ function handleShare() {
     shareType: 'result_bottom',
     resultType: testStore.result?.personalityType || '',
   })
-  uni.showToast({
-    title: '点击右上角「分享」发送给好友',
-    icon: 'none',
-    duration: 2000,
-  })
+  showPoster.value = true
+}
+
+/** 关闭分享海报 */
+function handleClosePoster() {
+  showPoster.value = false
 }
 
 /** 邀请横幅：拉起分享 */
@@ -517,6 +570,11 @@ function goToTest() {
 function goToCompare() {
   track(AnalyticsEvent.COMPARE_START, { from: 'result_page' })
   uni.navigateTo({ url: '/pagesReport/compare/index' })
+}
+
+/** 跳转到星灵图鉴页 */
+function goToAtlas() {
+  uni.navigateTo({ url: '/pagesUser/atlas/index' })
 }
 </script>
 
@@ -1082,6 +1140,81 @@ function goToCompare() {
   to {
     opacity: 1;
     transform: scale(1);
+  }
+}
+
+/* ===== 图鉴解锁提示 ===== */
+.atlas-unlock {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-sm $spacing-lg;
+  border-radius: $radius-full;
+  background: rgba(255, 215, 0, 0.08);
+  border: 1rpx solid rgba(255, 215, 0, 0.2);
+  margin-bottom: $spacing-sm;
+
+  &__icon { font-size: 28rpx; }
+  &__text { font-size: $font-xs; color: $accent-gold; flex: 1; }
+  &__arrow { font-size: $font-xs; color: rgba(255, 215, 0, 0.6); }
+
+  &:active { background: rgba(255, 215, 0, 0.15); }
+}
+
+.atlas-entry {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-sm $spacing-lg;
+  border-radius: $radius-full;
+  background: rgba(108, 60, 224, 0.1);
+  border: 1rpx solid rgba(108, 60, 224, 0.2);
+  margin-bottom: $spacing-md;
+
+  &__icon { font-size: 28rpx; }
+  &__text { font-size: $font-sm; color: $text-secondary; }
+  &__count { font-size: $font-xs; color: $accent-gold; margin-left: auto; }
+
+  &:active { background: rgba(108, 60, 224, 0.2); }
+}
+
+/* ===== 分享海报弹窗 ===== */
+.poster-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.85);
+  animation: fadeIn 0.3s ease;
+
+  &__content {
+    position: relative;
+    width: 85%;
+    max-width: 640rpx;
+    max-height: 85vh;
+    overflow-y: auto;
+    border-radius: $radius-lg;
+    background: linear-gradient(180deg, #1a0533, #0d0118);
+    padding: $spacing-lg;
+  }
+
+  &__close {
+    position: absolute;
+    top: -60rpx;
+    right: 0;
+    width: 56rpx;
+    height: 56rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+  }
+
+  &__close-text {
+    font-size: 40rpx;
+    color: rgba(255, 255, 255, 0.7);
   }
 }
 </style>

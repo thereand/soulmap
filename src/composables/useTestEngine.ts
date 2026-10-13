@@ -111,6 +111,12 @@ export function useTestEngine() {
   /** 对话选择记录（用于旅程故事） */
   const dialogueChoices = ref<Array<{ chapterId: string; guideId: GuideId; optionIndex: number }>>([])
 
+  /** 向导小剧场彩蛋状态 */
+  const miniTheaterGuide = ref<GuideId | null>(null)
+  const showMiniTheater = ref(false)
+  const consecutiveGuideCount = ref(0)
+  const lastConsecutiveGuide = ref<GuideId | null>(null)
+
   /* ===== 计算属性 ===== */
 
   /** 当前题目对象 */
@@ -193,6 +199,10 @@ export function useTestEngine() {
     showResonance.value = false
     chapterGuideSnapshots.value = {}
     dialogueChoices.value = []
+    miniTheaterGuide.value = null
+    showMiniTheater.value = false
+    consecutiveGuideCount.value = 0
+    lastConsecutiveGuide.value = null
     scoring.resetScoring()
     guideScoring.resetGuideScoring()
     clearSavedProgress()
@@ -228,8 +238,24 @@ export function useTestEngine() {
         (r) => r.questionId === q.id && r.guideId === triggeredGuide,
       )
       currentReaction.value = reaction?.text ?? ''
+
+      // 连续同一向导检测（小剧场彩蛋）
+      if (triggeredGuide === lastConsecutiveGuide.value) {
+        consecutiveGuideCount.value++
+        if (consecutiveGuideCount.value >= 3) {
+          miniTheaterGuide.value = triggeredGuide
+          showMiniTheater.value = true
+          consecutiveGuideCount.value = 0
+          lastConsecutiveGuide.value = null
+        }
+      } else {
+        consecutiveGuideCount.value = 1
+        lastConsecutiveGuide.value = triggeredGuide
+      }
     } else {
       currentReaction.value = ''
+      consecutiveGuideCount.value = 0
+      lastConsecutiveGuide.value = null
     }
 
     lastActiveTime.value = Date.now()
@@ -377,6 +403,14 @@ export function useTestEngine() {
   function confirmResonance(): void {
     showResonance.value = false
     resonanceGuide.value = null
+  }
+
+  /**
+   * 确认向导小剧场彩蛋已完成
+   */
+  function confirmMiniTheater(): void {
+    showMiniTheater.value = false
+    miniTheaterGuide.value = null
   }
 
   /**
@@ -607,6 +641,10 @@ export function useTestEngine() {
     showResonance.value = false
     chapterGuideSnapshots.value = {}
     dialogueChoices.value = []
+    miniTheaterGuide.value = null
+    showMiniTheater.value = false
+    consecutiveGuideCount.value = 0
+    lastConsecutiveGuide.value = null
     scoring.resetScoring()
     guideScoring.resetGuideScoring()
     clearSavedProgress()
@@ -631,6 +669,9 @@ export function useTestEngine() {
     isDialogueActive,
     resonanceGuide,
     showResonance,
+    // Phase 3 状态
+    miniTheaterGuide,
+    showMiniTheater,
     // 计算属性
     currentQuestion,
     totalQuestions,
@@ -656,6 +697,8 @@ export function useTestEngine() {
     // Phase 2 方法
     handleDialogueSelect,
     confirmResonance,
+    // Phase 3 方法
+    confirmMiniTheater,
     // 计分引擎（可直接访问）
     scoring,
     guideScoring,

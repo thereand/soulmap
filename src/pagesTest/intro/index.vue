@@ -37,6 +37,14 @@
         </text>
       </view>
 
+      <!-- 上次测试结果（回返用户） -->
+      <view v-if="previousResult" class="previous-result">
+        <text class="previous-result__label">上次的你</text>
+        <text class="previous-result__type">{{ previousResult.typeName }}</text>
+        <text v-if="previousResult.comboName" class="previous-result__combo">{{ previousResult.comboName }}</text>
+        <text class="previous-result__hint">这次会一样吗？</text>
+      </view>
+
       <!-- 开启旅程按钮 -->
       <view class="action-section">
         <view class="action-btn action-btn--active" @tap="handleStartJourney">
@@ -73,12 +81,42 @@ const showZodiac = ref(false)
 const showReady = ref(false)
 const selectedZodiacName = ref('')
 
+/** 上次测试结果（用于重测体验） */
+const previousResult = ref<{
+  type: string
+  typeName: string
+  comboName?: string
+} | null>(null)
+
+/** 检查是否有上次测试结果 */
+function checkPreviousResult() {
+  const store = testStore
+  if (store.result) {
+    const typeName = store.result.personalityType || ''
+    previousResult.value = {
+      type: typeName,
+      typeName: typeName, // Will be enriched by personality data lookup
+      comboName: store.guideCombination?.name || undefined,
+    }
+  } else {
+    store.hydrateResultFromStorage()
+    if (store.result) {
+      previousResult.value = {
+        type: store.result.personalityType || '',
+        typeName: store.result.personalityType || '',
+        comboName: store.guideCombination?.name || undefined,
+      }
+    }
+  }
+}
+
 onLoad(() => {
   console.log('[Page] 灵魂启程页加载')
 })
 
 onMounted(() => {
   setTimeout(() => { pageLoaded.value = true }, 100)
+  checkPreviousResult()
 })
 
 function starStyle(index: number) {
@@ -348,6 +386,47 @@ function handleBack() {
 
   &:active &__text {
     color: rgba(255, 255, 255, 0.6);
+  }
+}
+
+/* ===== 上次测试结果（重测体验） ===== */
+.previous-result {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12rpx;
+  padding: 32rpx 40rpx;
+  margin-bottom: 48rpx;
+  border-radius: $radius-lg;
+  background: rgba(108, 60, 224, 0.12);
+  border: 1rpx solid rgba(255, 215, 0, 0.15);
+  backdrop-filter: blur(8rpx);
+
+  &__label {
+    font-size: $font-xs;
+    color: rgba(255, 255, 255, 0.4);
+    letter-spacing: 4rpx;
+  }
+
+  &__type {
+    font-size: $font-xl;
+    font-weight: 700;
+    color: $accent-gold;
+    letter-spacing: 6rpx;
+    text-shadow: 0 0 16rpx rgba(255, 215, 0, 0.3);
+  }
+
+  &__combo {
+    font-size: $font-sm;
+    color: rgba(255, 255, 255, 0.55);
+    letter-spacing: 2rpx;
+  }
+
+  &__hint {
+    font-size: $font-xs;
+    color: rgba(255, 255, 255, 0.3);
+    font-style: italic;
+    margin-top: 8rpx;
   }
 }
 </style>

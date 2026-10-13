@@ -138,6 +138,13 @@
       :visible="engine.showResonance.value"
       @complete="handleResonanceComplete"
     />
+
+    <!-- 向导小剧场彩蛋 -->
+    <GuideMiniTheater
+      :guide-id="engine.miniTheaterGuide.value || 'flame'"
+      :visible="engine.showMiniTheater.value"
+      @complete="handleMiniTheaterComplete"
+    />
   </view>
 </template>
 
@@ -156,6 +163,7 @@ import GuideReaction from '@/components/test/GuideReaction.vue'
 import GuideDialogue from '@/components/test/GuideDialogue.vue'
 import SoulResonance from '@/components/test/SoulResonance.vue'
 import StarMapIndicator from '@/components/test/StarMapIndicator.vue'
+import GuideMiniTheater from '@/components/test/GuideMiniTheater.vue'
 
 /* ===== 引擎初始化 ===== */
 const engine = useTestEngine()
@@ -371,6 +379,11 @@ function handleDialogueComplete(): void {
 /** 灵魂共鸣动画完成 */
 function handleResonanceComplete(): void {
   engine.confirmResonance()
+}
+
+/** 向导小剧场彩蛋完成 */
+function handleMiniTheaterComplete(): void {
+  engine.confirmMiniTheater()
 }
 </script>
 

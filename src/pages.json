@@ -105,6 +105,17 @@
             "navigationBarTextStyle": "white",
             "backgroundColor": "#0d0118"
           }
+        },
+        {
+          "path": "atlas/index",
+          "style": {
+            "navigationBarTitleText": "星灵图鉴",
+            "navigationBarBackgroundColor": "#0d0118",
+            "navigationBarTextStyle": "white",
+            "backgroundColor": "#0d0118",
+            "navigationStyle": "custom",
+            "enablePullDownRefresh": true
+          }
         }
       ]
     },
