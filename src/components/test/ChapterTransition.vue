@@ -93,16 +93,20 @@ const showContent = ref(false)
 const showTitle = ref(false)
 const showFragment = ref(false)
 
-/** 碎片对应的 emoji */
+/** 碎片对应的 emoji（按章节 ID 编号查找） */
 const fragmentEmoji = computed(() => {
-  const emojis = ['✦', '◈', '❋', '⚡', '☯']
-  return emojis[props.chapterNumber - 1] ?? '✦'
+  const emojis: Record<number, string> = {
+    1: '✦', 2: '◈', 3: '❋', 4: '⚡', 5: '☯', 6: '⟡',
+  }
+  return emojis[props.chapterNumber] ?? '✦'
 })
 
-/** 章节副标题 */
+/** 章节副标题（按章节 ID 编号查） */
 const chapterSubtitle = computed(() => {
-  const subtitles = ['觉醒', '探索', '抉择', '蜕变', '归宿']
-  return subtitles[props.chapterNumber - 1] ?? ''
+  const subtitles: Record<number, string> = {
+    1: '觉醒', 2: '探索', 3: '抉择', 4: '蜕变', 5: '归宿', 6: '试炼',
+  }
+  return subtitles[props.chapterNumber] ?? ''
 })
 
 /** 关闭定时器 */

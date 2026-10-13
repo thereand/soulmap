@@ -1,7 +1,7 @@
 import type { Chapter } from '@/types/test'
 
 /**
- * 灵魂星图 — 章节配置
+ * 灵魂星图 — 章节配置（6 章 36 题）
  */
 export const chapters: Chapter[] = [
   {
@@ -10,7 +10,7 @@ export const chapters: Chapter[] = [
     description: '你从一片神秘的银白迷雾中醒来，四周弥漫着未知的气息。星象仪缓缓转动，古老的符文开始发光——灵魂之旅从这里开始。在这个章节中，你将面对未知的环境，做出最初的选择，认识最真实的自己。',
     icon: 'awakening',
     order: 1,
-    questionIds: ['q1', 'q2', 'q3', 'q4', 'q5'],
+    questionIds: ['q1', 'q2', 'q3', 'q4', 'q5', 'q32'],
     themeColor: '#7B68EE',
   },
   {
@@ -19,7 +19,7 @@ export const chapters: Chapter[] = [
     description: '穿过迷雾之门，你来到一座由琥珀构成的浮空城市。会唱歌的花朵、装满梦境的药水、空白的魔法书籍……这个奇幻世界充满了等待被发现的秘密。你将以自己的方式理解这一切，寻找属于你的答案。',
     icon: 'exploration',
     order: 2,
-    questionIds: ['q6', 'q7', 'q8', 'q9', 'q10'],
+    questionIds: ['q6', 'q7', 'q8', 'q9', 'q10', 'q33'],
     themeColor: '#00CED1',
   },
   {
@@ -32,12 +32,21 @@ export const chapters: Chapter[] = [
     themeColor: '#FF6B6B',
   },
   {
+    id: 'ch6',
+    name: '第六章：试炼',
+    description: '离开暗林后，你来到悬浮在虚空中的灵魂试炼场。守星者宣布："你的选择定义了你的道路，但真正的灵魂需要在试炼中证明。"在这里，每一刻都紧迫，每一个决定都在揭示你最真实的自己。',
+    icon: 'trial',
+    order: 4,
+    questionIds: ['q26', 'q27', 'q28', 'q29', 'q30', 'q31'],
+    themeColor: '#E91E63',
+  },
+  {
     id: 'ch4',
     name: '第四章：蜕变',
     description: '暗潮倾泻而下，大地在震颤。灵魂武装在你手中成形，记忆之镜映出过去与未来。在最深的压力下，你展现出最真实的自己。试炼之桥的光块在脚下浮动——是稳步前行，还是纵身飞跃？',
     icon: 'metamorphosis',
-    order: 4,
-    questionIds: ['q16', 'q17', 'q18', 'q19', 'q20'],
+    order: 5,
+    questionIds: ['q16', 'q17', 'q18', 'q19', 'q20', 'q34'],
     themeColor: '#FFA726',
   },
   {
@@ -45,8 +54,8 @@ export const chapters: Chapter[] = [
     name: '第五章：归宿',
     description: '灵魂圣殿的大门为你敞开，一片无垠的空白世界等待你的塑造。大地、流水、风——选择你的元素；守序者、梦想家、旅行者——召唤你的居民。在这里，你将构建属于自己的理想世界，找到灵魂最终的归宿。',
     icon: 'sanctuary',
-    order: 5,
-    questionIds: ['q21', 'q22', 'q23', 'q24', 'q25'],
+    order: 6,
+    questionIds: ['q21', 'q22', 'q23', 'q24', 'q25', 'q35', 'q36'],
     themeColor: '#AB47BC',
   },
 ]
@@ -87,5 +96,11 @@ export const chapterMeta: Record<string, {
     fragmentName: '归宿之碎片',
     fragmentIcon: 'fragment_sanctuary',
     background: 'chapter5_bg',
+  },
+  ch6: {
+    subtitle: '灵魂试炼',
+    fragmentName: '试炼之碎片',
+    fragmentIcon: 'fragment_trial',
+    background: 'chapter6_bg',
   },
 }

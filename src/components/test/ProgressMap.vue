@@ -96,11 +96,11 @@ interface Props {
 withDefaults(defineProps<Props>(), {
   currentChapter: 1,
   currentQuestionInChapter: 0,
-  totalChapters: 5,
+  totalChapters: 6,
 })
 
-/** 章节简称 */
-const chapterNames = ['觉醒', '探索', '抉择', '蜕变', '归宿']
+/** 章节简称（含试炼章） */
+const chapterNames = ['觉醒', '探索', '抉择', '试炼', '蜕变', '归宿']
 </script>
 
 <style lang="scss" scoped>

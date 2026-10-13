@@ -27,6 +27,13 @@ interface TestOption {
     TF?: number
     JP?: number
   }
+  /** 该选项对四大引导元素的亲和力权重（flame/abyss/forest/star） */
+  guides?: {
+    flame?: number
+    abyss?: number
+    forest?: number
+    star?: number
+  }
   /** 是否为反向计分选项 */
   reverse?: boolean
 }

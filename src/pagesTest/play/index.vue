@@ -32,7 +32,7 @@
       <ProgressMap
         :current-chapter="engine.currentChapter.value"
         :current-question-in-chapter="questionNumberInChapter"
-        :total-chapters="5"
+        :total-chapters="6"
       />
     </view>
 
@@ -47,7 +47,7 @@
       <view class="chapter-header" :key="'ch-' + engine.currentChapter.value">
         <text class="chapter-badge">{{ currentChapterSubtitle }}</text>
         <text class="chapter-divider">·</text>
-        <text class="chapter-count">{{ engine.questionNumberInChapter.value }} / 5</text>
+        <text class="chapter-count">{{ engine.questionNumberInChapter.value }} / {{ currentChapterTotal }}</text>
       </view>
 
       <!-- 剧情场景卡片 -->
@@ -58,6 +58,13 @@
           ref="storyCardRef"
         />
       </view>
+
+      <!-- 向导即时反应浮动文字 -->
+      <GuideReaction
+        :text="engine.currentReaction.value"
+        :guide-id="engine.currentDominantGuide.value"
+        :visible="!!engine.currentReaction.value"
+      />
 
       <!-- 选项按钮区域 -->
       <view
@@ -101,6 +108,14 @@
       :visible="showTransition"
       @close="handleTransitionClose"
     />
+
+    <!-- 向导叙事叠加层（章节开始时显示） -->
+    <GuideOverlay
+      :text="currentOverlayText"
+      :guide-id="engine.currentDominantGuide.value"
+      :visible="showGuideOverlay"
+      @complete="handleOverlayComplete"
+    />
   </view>
 </template>
 
@@ -114,6 +129,8 @@ import ProgressMap from '@/components/test/ProgressMap.vue'
 import StoryCard from '@/components/test/StoryCard.vue'
 import OptionButton from '@/components/test/OptionButton.vue'
 import ChapterTransition from '@/components/test/ChapterTransition.vue'
+import GuideOverlay from '@/components/test/GuideOverlay.vue'
+import GuideReaction from '@/components/test/GuideReaction.vue'
 
 /* ===== 引擎初始化 ===== */
 const engine = useTestEngine()
@@ -147,6 +164,17 @@ const storyCardRef = ref<InstanceType<typeof StoryCard> | null>(null)
 
 /** 滚动目标 */
 const scrollTarget = ref('')
+
+/** 向导叙事叠加层状态 */
+const showGuideOverlay = ref(false)
+const currentOverlayText = ref('')
+
+/** 当前章节总题数（动态计算） */
+const currentChapterTotal = computed(() => {
+  const chId = `ch${engine.currentChapter.value}`
+  const chapter = engine.chaptersList.value.find(c => c.id === chId)
+  return chapter?.questionIds.length ?? 5
+})
 
 /** 当前章节副标题 */
 const currentChapterSubtitle = computed(() => {
@@ -185,6 +213,16 @@ watch(
     showOptions.value = false
     isTransitioning.value = false
     scheduleShowOptions()
+
+    // 新章节的第一题时，显示向导叙事叠加层
+    if (engine.questionNumberInChapter.value === 1) {
+      const chId = `ch${engine.currentChapter.value}`
+      const overlayText = engine.getChapterOverlay(chId)
+      if (overlayText) {
+        currentOverlayText.value = overlayText
+        showGuideOverlay.value = true
+      }
+    }
   },
 )
 
@@ -209,7 +247,7 @@ watch(
   () => engine.isCompleted.value,
   (val) => {
     if (val) {
-      // 计算结果
+      // 计算结果（含向导系统）
       const engineResult = engine.getResult()
       const pct = engineResult.percentages || { EI: 50, SN: 50, TF: 50, JP: 50 }
       const dims = engineResult.scores || { EI: 50, SN: 50, TF: 50, JP: 50 }
@@ -232,8 +270,13 @@ watch(
         reportUnlocked: false,
       }
 
+      // 提取向导系统结果
+      const guideResult = engineResult.guideResult
+      const guideScores = guideResult?.rawScores ?? undefined
+      const guideCombo = guideResult?.combination ?? undefined
+
       // 写入 Pinia store（结果页会从这里读）
-      testStore.setResult(testResult)
+      testStore.setResult(testResult, guideScores, guideCombo)
 
       // 延迟跳转结果页
       setTimeout(() => {
@@ -280,6 +323,11 @@ function handleTransitionClose(): void {
   selectedOptionIndex.value = -1
   showOptions.value = false
   scheduleShowOptions()
+}
+
+/** 向导叙事叠加层完成 */
+function handleOverlayComplete(): void {
+  showGuideOverlay.value = false
 }
 </script>
 

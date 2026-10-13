@@ -10,8 +10,14 @@
 import { ref, computed } from 'vue'
 import type { TestQuestion, Chapter } from '@/types/test'
 import { soulmapMainQuestions } from '@/data/questions/soulmap-main'
+import { soulmapTrialQuestions } from '@/data/questions/soulmap-trial'
+import { soulmapSupplementQuestions } from '@/data/questions/soulmap-supplement'
 import { chapters as chapterData } from '@/data/chapters'
 import { useScoring, type AnswerRecord } from './useScoring'
+import { useGuideScoring } from './useGuideScoring'
+import type { GuideId } from '@/types/guide'
+import { guideReactions } from '@/data/guide-reactions'
+import { guideOverlays } from '@/data/guide-overlays'
 
 /** 本地存储键名 */
 const STORAGE_KEY = 'SOULMAP_TEST_PROGRESS'
@@ -28,8 +34,25 @@ interface SavedProgress {
 export function useTestEngine() {
   /* ===== 题目与章节数据（只读） ===== */
 
-  /** 全部 25 道题目 */
-  const questions = ref<TestQuestion[]>(soulmapMainQuestions)
+  /** 全部 36 道题目（主线 25 + 试炼 6 + 补充 5） */
+  const allQuestions = [
+    ...soulmapMainQuestions,
+    ...soulmapTrialQuestions,
+    ...soulmapSupplementQuestions,
+  ]
+
+  /** 按章节顺序排列的题目列表 */
+  const orderedQuestions = computed<TestQuestion[]>(() => {
+    const chapterOrder = chapterData.map((c) => c.id)
+    return [...allQuestions].sort((a, b) => {
+      const aChIdx = chapterOrder.indexOf(a.chapterId)
+      const bChIdx = chapterOrder.indexOf(b.chapterId)
+      if (aChIdx !== bChIdx) return aChIdx - bChIdx
+      return a.order - b.order
+    })
+  })
+
+  const questions = ref<TestQuestion[]>(orderedQuestions.value)
 
   /** 全部章节配置 */
   const chaptersList = ref<Chapter[]>(chapterData)
@@ -62,6 +85,15 @@ export function useTestEngine() {
 
   /** 计分引擎实例 */
   const scoring = useScoring()
+
+  /** 向导评分引擎实例 */
+  const guideScoring = useGuideScoring()
+
+  /** 当前题目的即时反应文本 */
+  const currentReaction = ref<string>('')
+
+  /** 当前章节的主导向导 */
+  const currentDominantGuide = computed(() => guideScoring.dominantGuide.value)
 
   /* ===== 计算属性 ===== */
 
@@ -138,7 +170,9 @@ export function useTestEngine() {
     isCompleted.value = false
     startTime.value = Date.now()
     lastActiveTime.value = Date.now()
+    currentReaction.value = ''
     scoring.resetScoring()
+    guideScoring.resetGuideScoring()
     clearSavedProgress()
   }
 
@@ -163,6 +197,17 @@ export function useTestEngine() {
       answers.value[existingIdx] = record
     } else {
       answers.value.push(record)
+    }
+
+    // 记录向导亲和度 & 获取即时反应
+    const triggeredGuide = guideScoring.recordAnswer(q, optionIndex)
+    if (triggeredGuide) {
+      const reaction = guideReactions.find(
+        (r) => r.questionId === q.id && r.guideId === triggeredGuide,
+      )
+      currentReaction.value = reaction?.text ?? ''
+    } else {
+      currentReaction.value = ''
     }
 
     lastActiveTime.value = Date.now()
@@ -337,7 +382,21 @@ export function useTestEngine() {
       duration: Math.round((Date.now() - startTime.value) / 1000),
       totalQuestions: totalQuestions.value,
       answeredCount: answers.value.length,
+      // 向导系统结果
+      guideResult: guideScoring.computeGuideResult(answers.value, questions.value),
     }
+  }
+
+  /**
+   * 获取当前章节的向导叙事叠加层文本
+   * 根据当前主导向导返回对应的叠加叙事
+   */
+  function getChapterOverlay(chapterId: string): string {
+    const guide = guideScoring.dominantGuide.value
+    const overlay = guideOverlays.find(
+      (o) => o.chapterId === chapterId && o.guideId === guide,
+    )
+    return overlay?.text ?? ''
   }
 
   /**
@@ -352,7 +411,9 @@ export function useTestEngine() {
     isTimedMode.value = false
     startTime.value = 0
     lastActiveTime.value = 0
+    currentReaction.value = ''
     scoring.resetScoring()
+    guideScoring.resetGuideScoring()
     clearSavedProgress()
   }
 
@@ -369,6 +430,7 @@ export function useTestEngine() {
     isTimedMode,
     startTime,
     lastActiveTime,
+    currentReaction,
     // 计算属性
     currentQuestion,
     totalQuestions,
@@ -378,6 +440,7 @@ export function useTestEngine() {
     questionNumberInChapter,
     remainingQuestions,
     isCurrentAnswered,
+    currentDominantGuide,
     // 方法
     startTest,
     selectOption,
@@ -389,7 +452,9 @@ export function useTestEngine() {
     clearSavedProgress,
     getResult,
     resetTest,
+    getChapterOverlay,
     // 计分引擎（可直接访问）
     scoring,
+    guideScoring,
   }
 }

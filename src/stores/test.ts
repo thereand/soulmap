@@ -15,8 +15,12 @@ import type {
   TestResult,
   MBTIType,
 } from '@/types/test'
+import type { GuideAffinityScores, GuideCombination } from '@/types/guide'
 import { soulmapMainQuestions } from '@/data/questions/soulmap-main'
+import { soulmapTrialQuestions } from '@/data/questions/soulmap-trial'
+import { soulmapSupplementQuestions } from '@/data/questions/soulmap-supplement'
 import { chapters as chapterData } from '@/data/chapters'
+import { combinationMap } from '@/data/guides'
 import {
   calculateScores,
   determineType,
@@ -54,8 +58,17 @@ export const useTestStore = defineStore('test', () => {
   /** 测试结果（提交后） */
   const result = ref<TestResult | null>(null)
 
-  /** 选择的灵魂向导 ID */
+  /** 选择的灵魂向导 ID（旧版保留兼容） */
   const selectedGuide = ref<string | null>(null)
+
+  /** 用户选择的星座 ID */
+  const selectedZodiac = ref<string | null>(null)
+
+  /** 向导亲和度得分（测试完成后） */
+  const guideAffinityScores = ref<GuideAffinityScores | null>(null)
+
+  /** 星灵组合结果 */
+  const guideCombination = ref<GuideCombination | null>(null)
 
   /** 当前测试唯一标识 */
   const currentTestId = ref<string | null>(null)
@@ -100,7 +113,11 @@ export const useTestStore = defineStore('test', () => {
    * 加载题目和章节数据
    */
   function loadQuestionData(): void {
-    questions.value = soulmapMainQuestions
+    questions.value = [
+      ...soulmapMainQuestions,
+      ...soulmapTrialQuestions,
+      ...soulmapSupplementQuestions,
+    ]
     chapters.value = chapterData
   }
 
@@ -259,11 +276,29 @@ export const useTestStore = defineStore('test', () => {
   /**
    * 设置最终结果（由答题页在测试完成时调用）
    * 同时持久化一份到本地存储 SOULMAP_TEST_RESULT，用于刷新恢复
+   *
+   * @param res              - MBTI 测试结果
+   * @param guideScores      - 向导亲和度得分（可选）
+   * @param guideCombo       - 星灵组合（可选）
    */
-  function setResult(res: TestResult): void {
+  function setResult(
+    res: TestResult,
+    guideScores?: GuideAffinityScores,
+    guideCombo?: GuideCombination,
+  ): void {
     result.value = res
+    if (guideScores) guideAffinityScores.value = guideScores
+    if (guideCombo) guideCombination.value = guideCombo
+
+    // 持久化结果（包含向导数据）
+    const storeData = {
+      ...res,
+      guideAffinityScores: guideScores ?? null,
+      guideCombinationId: guideCombo?.id ?? null,
+      selectedZodiac: selectedZodiac.value,
+    }
     try {
-      uni.setStorageSync('SOULMAP_TEST_RESULT', JSON.stringify(res))
+      uni.setStorageSync('SOULMAP_TEST_RESULT', JSON.stringify(storeData))
     } catch (e) {
       console.error('[TestStore] 保存结果失败:', e)
     }
@@ -285,6 +320,17 @@ export const useTestStore = defineStore('test', () => {
       // 已经是标准 TestResult
       if (data && data.personalityType && data.confidence) {
         result.value = data as TestResult
+
+        // 恢复向导数据
+        if (data.guideAffinityScores) {
+          guideAffinityScores.value = data.guideAffinityScores
+        }
+        if (data.guideCombinationId) {
+          guideCombination.value = combinationMap[data.guideCombinationId] ?? null
+        }
+        if (data.selectedZodiac) {
+          selectedZodiac.value = data.selectedZodiac
+        }
         return true
       }
 
@@ -307,6 +353,12 @@ export const useTestStore = defineStore('test', () => {
           completedAt: Date.now(),
           duration: data.duration ?? 0,
           reportUnlocked: false,
+        }
+
+        // 恢复向导数据（如果有）
+        if (data.guideResult) {
+          guideAffinityScores.value = data.guideResult.rawScores
+          guideCombination.value = data.guideResult.combination
         }
         return true
       }
@@ -334,6 +386,22 @@ export const useTestStore = defineStore('test', () => {
   }
 
   /**
+   * 设置用户选择的星座
+   */
+  function setSelectedZodiac(zodiacId: string | null): void {
+    selectedZodiac.value = zodiacId
+    try {
+      uni.setStorageSync(STORE_CONFIG_KEY, JSON.stringify({
+        testMode: testMode.value,
+        selectedGuide: selectedGuide.value,
+        selectedZodiac: zodiacId,
+      }))
+    } catch (e) {
+      console.error('[TestStore] 保存星座选择失败:', e)
+    }
+  }
+
+  /**
    * 重置测试状态
    */
   function resetTest(): void {
@@ -342,6 +410,8 @@ export const useTestStore = defineStore('test', () => {
     questions.value = []
     chapters.value = []
     currentTestId.value = null
+    guideAffinityScores.value = null
+    guideCombination.value = null
   }
 
   /* ===== 持久化方法 ===== */
@@ -368,9 +438,10 @@ export const useTestStore = defineStore('test', () => {
     try {
       const raw = uni.getStorageSync(STORE_CONFIG_KEY)
       if (!raw) return
-      const config: StoreConfig = JSON.parse(raw as string)
+      const config = JSON.parse(raw as string)
       if (config.testMode) testMode.value = config.testMode
       if (config.selectedGuide !== undefined) selectedGuide.value = config.selectedGuide
+      if (config.selectedZodiac !== undefined) selectedZodiac.value = config.selectedZodiac
     } catch (e) {
       console.error('[TestStore] 恢复配置失败:', e)
     }
@@ -406,6 +477,9 @@ export const useTestStore = defineStore('test', () => {
     loadingQuestions,
     result,
     selectedGuide,
+    selectedZodiac,
+    guideAffinityScores,
+    guideCombination,
     currentTestId,
     testMode,
     // getters
@@ -426,6 +500,7 @@ export const useTestStore = defineStore('test', () => {
     hydrateResultFromStorage,
     setTestMode,
     setSelectedGuide,
+    setSelectedZodiac,
     resetTest,
     // 持久化
     saveConfig,

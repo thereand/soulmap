@@ -69,6 +69,23 @@
         <text class="result-title">{{ personalityData.title }}</text>
       </view>
 
+      <!-- 星灵组合卡片 -->
+      <view v-if="guideCombination && guideScores" class="result-section result-section--guide-combo">
+        <text class="section-heading">你的星灵组合</text>
+        <GuideComboCard
+          :combination="guideCombination"
+          :scores="guideScores"
+        />
+      </view>
+
+      <!-- 向导亲和度雷达图 -->
+      <view v-if="guideScores" class="result-section result-section--guide-radar">
+        <text class="section-heading">星灵亲和度</text>
+        <view class="radar-wrapper">
+          <GuideRadarChart :scores="guideNormalizedScores" />
+        </view>
+      </view>
+
       <!-- 维度雷达图 -->
       <view class="result-section result-section--radar">
         <text class="section-heading">维度分析</text>
@@ -210,6 +227,8 @@ import { personalityTypes } from '@/data/results/types'
 import { freeReports } from '@/data/results/free-reports'
 import CharacterCard from '@/components/result/CharacterCard.vue'
 import RadarChart from '@/components/result/RadarChart.vue'
+import GuideComboCard from '@/components/result/GuideComboCard.vue'
+import GuideRadarChart from '@/components/result/GuideRadarChart.vue'
 import PayWall from '@/components/payment/PayWall.vue'
 import TimedOffer from '@/components/payment/TimedOffer.vue'
 import InviteBanner from '@/components/shared/InviteBanner.vue'
@@ -267,6 +286,7 @@ const dimensionDetails = computed(() => {
   if (!testResult.value) return []
   const scores = testResult.value.dimensionScores
   const conf = testResult.value.confidence
+
   return [
     {
       key: 'EI',
@@ -289,6 +309,26 @@ const dimensionDetails = computed(() => {
       pct: Math.round(conf.JP * 100),
     },
   ]
+})
+
+/** 星灵组合（从 store 读取） */
+const guideCombination = computed(() => testStore.guideCombination)
+
+/** 向导亲和度原始分（从 store 读取） */
+const guideScores = computed(() => testStore.guideAffinityScores)
+
+/** 向导亲和度归一化分数（用于雷达图） */
+const guideNormalizedScores = computed(() => {
+  const s = guideScores.value
+  if (!s) return { flame: 50, abyss: 50, forest: 50, star: 50 }
+  // 简单归一化：假设原始分范围大约 0-25，映射到 0-100
+  const normalize = (v: number) => Math.max(5, Math.min(100, Math.round((v / 25) * 100)))
+  return {
+    flame: normalize(s.flame),
+    abyss: normalize(s.abyss),
+    forest: normalize(s.forest),
+    star: normalize(s.star),
+  }
 })
 
 /** 头部光晕样式 */

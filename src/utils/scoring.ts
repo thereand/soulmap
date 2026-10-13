@@ -12,6 +12,7 @@
  */
 
 import type { DimensionScores, TestQuestion, MBTIType } from '@/types/test'
+import type { GuideAffinityScores, GuideId } from '@/types/guide'
 
 /* ─────────────────────── 类型定义 ─────────────────────── */
 
@@ -224,6 +225,120 @@ function getMaxPossibleScores(
   }
 
   return max
+}
+
+/* ─────────────────────── 向导亲和度计算 ─────────────────────── */
+
+/** 向导维度标识 */
+type GuideKey = 'flame' | 'abyss' | 'forest' | 'star'
+
+const GUIDE_KEYS: GuideKey[] = ['flame', 'abyss', 'forest', 'star']
+
+/**
+ * 计算向导亲和度累计得分
+ *
+ * 遍历所有答案，将选项的 guides 权重累加到对应向导。
+ * 与 MBTI 的 calculateScores 平行运行。
+ *
+ * @param answers   - 用户答题记录
+ * @param questions - 完整题目数据
+ * @returns 四位向导的累计亲和度得分
+ */
+export function calculateGuideAffinity(
+  answers: AnswerRecord[],
+  questions: TestQuestion[],
+): GuideAffinityScores {
+  const scores: GuideAffinityScores = { flame: 0, abyss: 0, forest: 0, star: 0 }
+
+  for (const answer of answers) {
+    const question = questions.find((q) => q.id === answer.questionId)
+    if (!question) continue
+
+    const option = question.options[answer.optionIndex]
+    if (!option || !option.guides) continue
+
+    const g = option.guides
+    if (g.flame !== undefined) scores.flame += g.flame
+    if (g.abyss !== undefined) scores.abyss += g.abyss
+    if (g.forest !== undefined) scores.forest += g.forest
+    if (g.star !== undefined) scores.star += g.star
+  }
+
+  return scores
+}
+
+/**
+ * 获取某道题某个选项触发的最强向导反应
+ *
+ * 用于在用户选择选项后显示浮动文字。
+ * 返回该选项中 guides 权重最高的向导 ID。
+ *
+ * @param question    - 题目对象
+ * @param optionIndex - 选项索引
+ * @returns 最强反应的向导 ID，如无 guides 数据返回 null
+ */
+export function getStrongestGuideReaction(
+  question: TestQuestion,
+  optionIndex: number,
+): GuideId | null {
+  const option = question.options[optionIndex]
+  if (!option || !option.guides) return null
+
+  let maxGuide: GuideId = 'flame'
+  let maxWeight = -Infinity
+
+  for (const key of GUIDE_KEYS) {
+    const w = option.guides[key]
+    if (w !== undefined && w > maxWeight) {
+      maxWeight = w
+      maxGuide = key
+    }
+  }
+
+  return maxWeight > 0 ? maxGuide : null
+}
+
+/**
+ * 将向导亲和度原始分映射到 0-100 范围（用于雷达图展示）
+ *
+ * 转换方式：每个向导的得分除以该向导在所有题目中的最大可能得分，
+ * 再乘以 100。限制在 [0, 100]。
+ *
+ * @param scores    - 向导亲和度原始得分
+ * @param questions - 完整题目数据（用于计算最大可能值）
+ * @returns 0-100 范围的各向导得分
+ */
+export function normalizeGuideScores(
+  scores: GuideAffinityScores,
+  questions: TestQuestion[],
+): GuideAffinityScores {
+  // 计算每个向导的最大可能得分
+  const maxScores: GuideAffinityScores = { flame: 0, abyss: 0, forest: 0, star: 0 }
+
+  for (const question of questions) {
+    for (const key of GUIDE_KEYS) {
+      let maxWeight = 0
+      for (const option of question.options) {
+        const w = option.guides?.[key]
+        if (w !== undefined && w > maxWeight) {
+          maxWeight = w
+        }
+      }
+      maxScores[key] += maxWeight
+    }
+  }
+
+  const normalize = (raw: number, max: number): number => {
+    if (max === 0) return 0
+    return Math.max(0, Math.min(100, Math.round((raw / max) * 100)))
+  }
+
+  return {
+    flame: normalize(scores.flame, maxScores.flame),
+    abyss: normalize(scores.abyss, maxScores.abyss),
+    forest: normalize(scores.forest, maxScores.forest),
+    star: normalize(scores.star, maxScores.star),
+  }
 }
 
 /* ─────────────────────── 单元测试用例说明 ─────────────────────── */
