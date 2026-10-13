@@ -70,6 +70,9 @@ export const useTestStore = defineStore('test', () => {
   /** 星灵组合结果 */
   const guideCombination = ref<GuideCombination | null>(null)
 
+  /** 旅程故事文本 */
+  const journeyStory = ref<string | null>(null)
+
   /** 当前测试唯一标识 */
   const currentTestId = ref<string | null>(null)
 
@@ -285,17 +288,20 @@ export const useTestStore = defineStore('test', () => {
     res: TestResult,
     guideScores?: GuideAffinityScores,
     guideCombo?: GuideCombination,
+    journey?: string,
   ): void {
     result.value = res
     if (guideScores) guideAffinityScores.value = guideScores
     if (guideCombo) guideCombination.value = guideCombo
+    if (journey) journeyStory.value = journey
 
-    // 持久化结果（包含向导数据）
+    // 持久化结果（包含向导数据和旅程故事）
     const storeData = {
       ...res,
       guideAffinityScores: guideScores ?? null,
       guideCombinationId: guideCombo?.id ?? null,
       selectedZodiac: selectedZodiac.value,
+      journeyStory: journey ?? null,
     }
     try {
       uni.setStorageSync('SOULMAP_TEST_RESULT', JSON.stringify(storeData))
@@ -412,6 +418,7 @@ export const useTestStore = defineStore('test', () => {
     currentTestId.value = null
     guideAffinityScores.value = null
     guideCombination.value = null
+    journeyStory.value = null
   }
 
   /* ===== 持久化方法 ===== */
@@ -480,6 +487,7 @@ export const useTestStore = defineStore('test', () => {
     selectedZodiac,
     guideAffinityScores,
     guideCombination,
+    journeyStory,
     currentTestId,
     testMode,
     // getters

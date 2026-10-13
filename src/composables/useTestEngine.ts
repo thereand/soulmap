@@ -18,6 +18,8 @@ import { useGuideScoring } from './useGuideScoring'
 import type { GuideId } from '@/types/guide'
 import { guideReactions } from '@/data/guide-reactions'
 import { guideOverlays } from '@/data/guide-overlays'
+import { guideDialogues } from '@/data/guide-dialogues'
+import { assembleJourneyStory } from '@/data/journey-narratives'
 
 /** 本地存储键名 */
 const STORAGE_KEY = 'SOULMAP_TEST_PROGRESS'
@@ -95,6 +97,20 @@ export function useTestEngine() {
   /** 当前章节的主导向导 */
   const currentDominantGuide = computed(() => guideScoring.dominantGuide.value)
 
+  /** 向导对话互动状态 */
+  const activeDialogue = ref<typeof guideDialogues[0] | null>(null)
+  const isDialogueActive = ref(false)
+
+  /** 灵魂共鸣动画状态 */
+  const resonanceGuide = ref<GuideId | null>(null)
+  const showResonance = ref(false)
+
+  /** 每章向导亲和度快照（用于共鸣检测） */
+  const chapterGuideSnapshots = ref<Record<string, Record<GuideId, number>>>({})
+
+  /** 对话选择记录（用于旅程故事） */
+  const dialogueChoices = ref<Array<{ chapterId: string; guideId: GuideId; optionIndex: number }>>([])
+
   /* ===== 计算属性 ===== */
 
   /** 当前题目对象 */
@@ -171,6 +187,12 @@ export function useTestEngine() {
     startTime.value = Date.now()
     lastActiveTime.value = Date.now()
     currentReaction.value = ''
+    activeDialogue.value = null
+    isDialogueActive.value = false
+    resonanceGuide.value = null
+    showResonance.value = false
+    chapterGuideSnapshots.value = {}
+    dialogueChoices.value = []
     scoring.resetScoring()
     guideScoring.resetGuideScoring()
     clearSavedProgress()
@@ -222,8 +244,84 @@ export function useTestEngine() {
    */
   function advanceToNext(): void {
     const nextIndex = currentQuestionIndex.value + 1
+    const currentQ = questions.value[currentQuestionIndex.value]
+
+    // 检查向导对话触发（Q13 后 = ch3 对话，Q18 后 = ch4 对话）
+    if (currentQ && (currentQ.id === 'q13' || currentQ.id === 'q18')) {
+      const dialogue = findDialogueForCurrentChapter(currentQ.chapterId)
+      if (dialogue) {
+        activeDialogue.value = dialogue
+        isDialogueActive.value = true
+        // 对话完成后再继续前进
+        return
+      }
+    }
 
     // 已到最后一题之后 → 测试完成
+    if (nextIndex >= questions.value.length) {
+      isCompleted.value = true
+      saveProgress()
+      return
+    }
+
+    const nextQ = questions.value[nextIndex]
+
+    // 检查是否跨越章节边界
+    if (currentQ && nextQ && currentQ.chapterId !== nextQ.chapterId) {
+      // 灵魂共鸣检测：章节结束时检查该章的向导亲和度是否足够高
+      checkSoulResonance(currentQ.chapterId)
+
+      const newChapterNum = parseInt(nextQ.chapterId.replace('ch', ''), 10)
+      currentChapter.value = newChapterNum
+      isChapterTransition.value = true
+    }
+
+    currentQuestionIndex.value = nextIndex
+    saveProgress()
+  }
+
+  /**
+   * 查找当前章节的向导对话（根据主导向导）
+   */
+  function findDialogueForCurrentChapter(chapterId: string) {
+    const guide = guideScoring.dominantGuide.value
+    return guideDialogues.find(
+      (d) => d.chapterId === chapterId && d.guideId === guide,
+    ) ?? null
+  }
+
+  /**
+   * 处理对话选择
+   * UI 层在用户选择对话选项后调用
+   */
+  function handleDialogueSelect(optionIndex: number): void {
+    if (!activeDialogue.value) return
+
+    const dialogue = activeDialogue.value
+    const option = dialogue.options[optionIndex]
+
+    // 记录对话选择（用于旅程故事）
+    dialogueChoices.value.push({
+      chapterId: dialogue.chapterId,
+      guideId: dialogue.guideId,
+      optionIndex,
+    })
+
+    // 应用对话选项的向导亲和度加成
+    if (option?.guideBonus) {
+      const scores = guideScoring.rawGuideScores.value
+      if (option.guideBonus.flame) scores.flame += option.guideBonus.flame
+      if (option.guideBonus.abyss) scores.abyss += option.guideBonus.abyss
+      if (option.guideBonus.forest) scores.forest += option.guideBonus.forest
+      if (option.guideBonus.star) scores.star += option.guideBonus.star
+    }
+
+    // 清除对话状态，继续前进
+    activeDialogue.value = null
+    isDialogueActive.value = false
+
+    // 继续前进到下一题
+    const nextIndex = currentQuestionIndex.value + 1
     if (nextIndex >= questions.value.length) {
       isCompleted.value = true
       saveProgress()
@@ -233,9 +331,8 @@ export function useTestEngine() {
     const currentQ = questions.value[currentQuestionIndex.value]
     const nextQ = questions.value[nextIndex]
 
-    // 检查是否跨越章节边界
     if (currentQ && nextQ && currentQ.chapterId !== nextQ.chapterId) {
-      // 从 chapterId 解析新章节编号，如 'ch3' → 3
+      checkSoulResonance(currentQ.chapterId)
       const newChapterNum = parseInt(nextQ.chapterId.replace('ch', ''), 10)
       currentChapter.value = newChapterNum
       isChapterTransition.value = true
@@ -243,6 +340,43 @@ export function useTestEngine() {
 
     currentQuestionIndex.value = nextIndex
     saveProgress()
+  }
+
+  /**
+   * 灵魂共鸣检测
+   * 章节结束时，检查该章节内向导亲和度增量是否达到阈值
+   */
+  function checkSoulResonance(chapterId: string): void {
+    const current = guideScoring.rawGuideScores.value
+    const snapshot = chapterGuideSnapshots.value[chapterId]
+
+    if (!snapshot) {
+      // 首次记录此章节的快照
+      chapterGuideSnapshots.value[chapterId] = { ...current }
+      return
+    }
+
+    // 检查哪个向导在本章获得了足够的亲和度（阈值 5+）
+    const guideKeys: GuideId[] = ['flame', 'abyss', 'forest', 'star']
+    for (const key of guideKeys) {
+      const delta = current[key] - snapshot[key]
+      if (delta >= 5) {
+        resonanceGuide.value = key
+        showResonance.value = true
+        break // 只显示最强的一个
+      }
+    }
+
+    // 更新快照
+    chapterGuideSnapshots.value[chapterId] = { ...current }
+  }
+
+  /**
+   * 确认灵魂共鸣动画已完成
+   */
+  function confirmResonance(): void {
+    showResonance.value = false
+    resonanceGuide.value = null
   }
 
   /**
@@ -372,6 +506,12 @@ export function useTestEngine() {
   function getResult() {
     scoring.computeResult(answers.value, questions.value)
 
+    // 计算向导结果
+    const guideResult = guideScoring.computeGuideResult(answers.value, questions.value)
+
+    // 生成旅程故事
+    const journeyStory = generateJourneyStory(guideResult)
+
     return {
       type: scoring.resultType.value,
       scores: scoring.scores.value,
@@ -383,8 +523,57 @@ export function useTestEngine() {
       totalQuestions: totalQuestions.value,
       answeredCount: answers.value.length,
       // 向导系统结果
-      guideResult: guideScoring.computeGuideResult(answers.value, questions.value),
+      guideResult,
+      // 旅程故事
+      journeyStory,
     }
+  }
+
+  /**
+   * 生成旅程故事
+   * 根据用户在旅途中的关键选择拼接叙事化解读
+   */
+  function generateJourneyStory(guideResult: ReturnType<typeof guideScoring.computeGuideResult>): string {
+    // 开场：基于第一章的主导向导
+    const ch1Guide = getChapterDominantGuide('ch1') ?? guideResult.dominantGuide
+
+    // 中段：基于第三章的前两位向导组合
+    const topTwo = guideResult.topTwo
+    const midpointKey = [topTwo[0], topTwo[1]].sort().join('_')
+
+    // 高潮：基于第四章的前两位向导组合
+    const climaxKey = midpointKey // 复用相同逻辑
+
+    // 结尾：基于最终组合 ID
+    const endingComboId = guideResult.combination.id
+
+    return assembleJourneyStory(ch1Guide, midpointKey, climaxKey, endingComboId)
+  }
+
+  /**
+   * 获取某章节内的主导向问（基于该章节回答的亲和度增量）
+   */
+  function getChapterDominantGuide(chapterId: string): GuideId | null {
+    const chapterQIds = chapterData.find(c => c.id === chapterId)?.questionIds ?? []
+    const chapterAnswers = answers.value.filter(a => chapterQIds.includes(a.questionId))
+
+    if (chapterAnswers.length === 0) return null
+
+    const scores = { flame: 0, abyss: 0, forest: 0, star: 0 }
+    for (const answer of chapterAnswers) {
+      const question = questions.value.find(q => q.id === answer.questionId)
+      if (!question) continue
+      const option = question.options[answer.optionIndex]
+      if (!option?.guides) continue
+      if (option.guides.flame) scores.flame += option.guides.flame
+      if (option.guides.abyss) scores.abyss += option.guides.abyss
+      if (option.guides.forest) scores.forest += option.guides.forest
+      if (option.guides.star) scores.star += option.guides.star
+    }
+
+    const entries = Object.entries(scores) as [GuideId, number][]
+    entries.sort((a, b) => b[1] - a[1])
+    return entries[0][1] > 0 ? entries[0][0] : null
   }
 
   /**
@@ -412,6 +601,12 @@ export function useTestEngine() {
     startTime.value = 0
     lastActiveTime.value = 0
     currentReaction.value = ''
+    activeDialogue.value = null
+    isDialogueActive.value = false
+    resonanceGuide.value = null
+    showResonance.value = false
+    chapterGuideSnapshots.value = {}
+    dialogueChoices.value = []
     scoring.resetScoring()
     guideScoring.resetGuideScoring()
     clearSavedProgress()
@@ -431,6 +626,11 @@ export function useTestEngine() {
     startTime,
     lastActiveTime,
     currentReaction,
+    // Phase 2 状态
+    activeDialogue,
+    isDialogueActive,
+    resonanceGuide,
+    showResonance,
     // 计算属性
     currentQuestion,
     totalQuestions,
@@ -453,6 +653,9 @@ export function useTestEngine() {
     getResult,
     resetTest,
     getChapterOverlay,
+    // Phase 2 方法
+    handleDialogueSelect,
+    confirmResonance,
     // 计分引擎（可直接访问）
     scoring,
     guideScoring,

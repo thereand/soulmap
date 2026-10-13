@@ -27,13 +27,19 @@
     <!-- 状态栏占位（自定义导航栏） -->
     <view class="status-bar" :style="{ height: statusBarHeight + 'px' }"></view>
 
-    <!-- 顶部：闯关地图进度条 -->
+    <!-- 顶部：闯关地图进度条 + 星图指示器 -->
     <view class="top-section">
       <ProgressMap
         :current-chapter="engine.currentChapter.value"
         :current-question-in-chapter="questionNumberInChapter"
         :total-chapters="6"
       />
+      <view class="star-map-wrapper">
+        <StarMapIndicator
+          :scores="engine.guideScoring.rawGuideScores.value"
+          compact
+        />
+      </view>
     </view>
 
     <!-- 主区域：题目卡片 + 选项 -->
@@ -116,6 +122,22 @@
       :visible="showGuideOverlay"
       @complete="handleOverlayComplete"
     />
+
+    <!-- 向导对话互动弹窗 -->
+    <GuideDialogue
+      :dialogue="engine.activeDialogue.value"
+      :visible="engine.isDialogueActive.value"
+      :guide-id="engine.currentDominantGuide.value"
+      @select="handleDialogueSelect"
+      @complete="handleDialogueComplete"
+    />
+
+    <!-- 灵魂共鸣动画 -->
+    <SoulResonance
+      :guide-id="engine.resonanceGuide.value || 'flame'"
+      :visible="engine.showResonance.value"
+      @complete="handleResonanceComplete"
+    />
   </view>
 </template>
 
@@ -131,6 +153,9 @@ import OptionButton from '@/components/test/OptionButton.vue'
 import ChapterTransition from '@/components/test/ChapterTransition.vue'
 import GuideOverlay from '@/components/test/GuideOverlay.vue'
 import GuideReaction from '@/components/test/GuideReaction.vue'
+import GuideDialogue from '@/components/test/GuideDialogue.vue'
+import SoulResonance from '@/components/test/SoulResonance.vue'
+import StarMapIndicator from '@/components/test/StarMapIndicator.vue'
 
 /* ===== 引擎初始化 ===== */
 const engine = useTestEngine()
@@ -275,8 +300,11 @@ watch(
       const guideScores = guideResult?.rawScores ?? undefined
       const guideCombo = guideResult?.combination ?? undefined
 
+      // 提取旅程故事
+      const journey = engineResult.journeyStory ?? undefined
+
       // 写入 Pinia store（结果页会从这里读）
-      testStore.setResult(testResult, guideScores, guideCombo)
+      testStore.setResult(testResult, guideScores, guideCombo, journey)
 
       // 延迟跳转结果页
       setTimeout(() => {
@@ -328,6 +356,21 @@ function handleTransitionClose(): void {
 /** 向导叙事叠加层完成 */
 function handleOverlayComplete(): void {
   showGuideOverlay.value = false
+}
+
+/** 向导对话选择 */
+function handleDialogueSelect(payload: { optionIndex: number }): void {
+  engine.handleDialogueSelect(payload.optionIndex)
+}
+
+/** 向导对话动画完成 */
+function handleDialogueComplete(): void {
+  // 对话组件自行完成动画后，引擎已在 handleDialogueSelect 中处理了前进逻辑
+}
+
+/** 灵魂共鸣动画完成 */
+function handleResonanceComplete(): void {
+  engine.confirmResonance()
 }
 </script>
 
@@ -397,6 +440,15 @@ function handleOverlayComplete(): void {
   position: relative;
   z-index: 10;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16rpx;
+}
+
+.star-map-wrapper {
+  flex-shrink: 0;
+  margin-left: 16rpx;
 }
 
 /* ===== 主内容区 ===== */

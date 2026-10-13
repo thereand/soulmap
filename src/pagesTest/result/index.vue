@@ -86,6 +86,15 @@
         </view>
       </view>
 
+      <!-- 星座融合解读 -->
+      <view v-if="selectedZodiac && testResult" class="result-section result-section--zodiac">
+        <text class="section-heading">星座密码</text>
+        <ZodiacFusionCard
+          :zodiac-id="selectedZodiac"
+          :mbti-type="testResult.personalityType"
+        />
+      </view>
+
       <!-- 维度雷达图 -->
       <view class="result-section result-section--radar">
         <text class="section-heading">维度分析</text>
@@ -112,6 +121,11 @@
             <text class="dim-bar__value">{{ dim.pct }}%</text>
           </view>
         </view>
+      </view>
+
+      <!-- 旅程故事 -->
+      <view v-if="journeyStoryText" class="result-section result-section--journey">
+        <JourneyStory :story="journeyStoryText" />
       </view>
 
       <!-- 免费报告摘要 -->
@@ -229,6 +243,8 @@ import CharacterCard from '@/components/result/CharacterCard.vue'
 import RadarChart from '@/components/result/RadarChart.vue'
 import GuideComboCard from '@/components/result/GuideComboCard.vue'
 import GuideRadarChart from '@/components/result/GuideRadarChart.vue'
+import ZodiacFusionCard from '@/components/result/ZodiacFusionCard.vue'
+import JourneyStory from '@/components/result/JourneyStory.vue'
 import PayWall from '@/components/payment/PayWall.vue'
 import TimedOffer from '@/components/payment/TimedOffer.vue'
 import InviteBanner from '@/components/shared/InviteBanner.vue'
@@ -330,6 +346,12 @@ const guideNormalizedScores = computed(() => {
     star: normalize(s.star),
   }
 })
+
+/** 用户选择的星座 ID */
+const selectedZodiac = computed(() => testStore.selectedZodiac)
+
+/** 旅程故事文本 */
+const journeyStoryText = computed(() => testStore.journeyStory)
 
 /** 头部光晕样式 */
 const headerGlowStyle = computed(() => {
