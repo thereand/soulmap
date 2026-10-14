@@ -73,15 +73,25 @@
         </view>
       </view>
     </view>
+
+    <!-- 隐私政策与用户协议同意弹窗（合规要求：用户主动阅读并勾选） -->
+    <PrivacyConsent :visible="showConsent" @agreed="onConsentAgreed" />
   </view>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { onLoad } from '@dcloudio/uni-app'
+import { onLoad, onShow } from '@dcloudio/uni-app'
+import PrivacyConsent from '@/components/shared/PrivacyConsent.vue'
+import {
+  hasAgreedCurrentVersion,
+  markAllAgreed,
+} from '@/composables/usePrivacyConsent'
 
 const pageLoaded = ref(false)
 const displayCount = ref('12,863')
+/** 隐私政策与用户协议弹窗是否展示 */
+const showConsent = ref(false)
 
 onLoad((query) => {
   console.log('[Page] 首页加载', query)
@@ -95,12 +105,33 @@ onLoad((query) => {
   }
 })
 
+onShow(() => {
+  // 每次回到首页都检查一次（协议更新 / 用户未同意时自动弹出）
+  if (!hasAgreedCurrentVersion()) {
+    showConsent.value = true
+  }
+})
+
 onMounted(() => {
   // 触发页面加载动画
   setTimeout(() => {
     pageLoaded.value = true
   }, 100)
+
+  // 首次进入：若未同意则弹出协议弹窗（合规要求）
+  if (!hasAgreedCurrentVersion()) {
+    // 延迟到动画后弹出，避免与页面渲染竞争
+    setTimeout(() => {
+      showConsent.value = true
+    }, 600)
+  }
 })
+
+/** 用户同意协议后回调 */
+function onConsentAgreed() {
+  markAllAgreed()
+  showConsent.value = false
+}
 
 /** 生成星星随机样式 */
 function starStyle(index: number, layer: string) {
@@ -121,6 +152,11 @@ function starStyle(index: number, layer: string) {
 }
 
 function handleStart() {
+  // 合规兜底：若未同意协议，先弹出弹窗（防止绕过）
+  if (!hasAgreedCurrentVersion()) {
+    showConsent.value = true
+    return
+  }
   uni.navigateTo({ url: '/pagesTest/intro/index' })
 }
 
