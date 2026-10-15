@@ -47,10 +47,22 @@
 
       <!-- 开启旅程按钮 -->
       <view class="action-section">
+        <!-- 继续上次进度（仅在检测到未完成存档时显示） -->
+        <view
+          v-if="hasUnfinishedProgress"
+          class="action-btn action-btn--ghost"
+          @tap="handleContinueJourney"
+        >
+          <view class="action-btn__inner">
+            <text class="action-btn__text">继续上次探索</text>
+            <text class="action-btn__arrow">→</text>
+          </view>
+        </view>
+
         <view class="action-btn action-btn--active" @tap="handleStartJourney">
           <view class="action-btn__glow" />
           <view class="action-btn__inner">
-            <text class="action-btn__text">开启灵魂探索</text>
+            <text class="action-btn__text">{{ hasUnfinishedProgress ? '重新开始' : '开启灵魂探索' }}</text>
             <text class="action-btn__arrow">→</text>
           </view>
         </view>
@@ -68,6 +80,7 @@
 import { ref, onMounted } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { useTestStore } from '@/stores/test'
+import { useTestEngine } from '@/composables/useTestEngine'
 import { zodiacMap } from '@/data/zodiac'
 import PrologueAnimation from '@/components/test/PrologueAnimation.vue'
 import ZodiacSelector from '@/components/test/ZodiacSelector.vue'
@@ -75,11 +88,14 @@ import ZodiacSelector from '@/components/test/ZodiacSelector.vue'
 type Phase = 'prologue' | 'zodiac' | 'ready'
 
 const testStore = useTestStore()
+const engine = useTestEngine()
 const pageLoaded = ref(false)
 const phase = ref<Phase>('prologue')
 const showZodiac = ref(false)
 const showReady = ref(false)
 const selectedZodiacName = ref('')
+/** 是否有未完成的答题进度（用于显示"继续上次探索"按钮） */
+const hasUnfinishedProgress = ref(false)
 
 /** 上次测试结果（用于重测体验） */
 const previousResult = ref<{
@@ -117,6 +133,8 @@ onLoad(() => {
 onMounted(() => {
   setTimeout(() => { pageLoaded.value = true }, 100)
   checkPreviousResult()
+  // 检测未完成的答题进度（用于显示"继续上次探索"按钮）
+  hasUnfinishedProgress.value = engine.hasSavedProgress()
 })
 
 function starStyle(index: number) {
@@ -159,6 +177,11 @@ function handleZodiacSkip() {
 
 /** 开启旅程 */
 function handleStartJourney() {
+  uni.navigateTo({ url: '/pagesTest/play/index' })
+}
+
+/** 继续上次的答题进度（play/index.vue 的 onLoad 会自动 loadProgress） */
+function handleContinueJourney() {
   uni.navigateTo({ url: '/pagesTest/play/index' })
 }
 
@@ -322,6 +345,32 @@ function handleBack() {
 
   &--active:active {
     transform: scale(0.97);
+  }
+
+  &--ghost {
+    height: 80rpx;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1.5rpx solid rgba(255, 215, 0, 0.35);
+    margin-bottom: $spacing-sm;
+
+    .action-btn__inner {
+      background: transparent;
+      border: none;
+    }
+
+    .action-btn__text {
+      color: $accent-gold;
+      font-weight: 600;
+    }
+
+    .action-btn__arrow {
+      color: $accent-gold;
+    }
+
+    &:active {
+      background: rgba(255, 215, 0, 0.08);
+      transform: scale(0.97);
+    }
   }
 }
 

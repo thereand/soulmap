@@ -17,7 +17,7 @@
         {
           "path": "intro/index",
           "style": {
-            "navigationBarTitleText": "探索引导",
+            "navigationBarTitleText": "启程",
             "navigationBarBackgroundColor": "#1a0533",
             "navigationBarTextStyle": "white",
             "backgroundColor": "#0d0118"
@@ -50,7 +50,7 @@
         {
           "path": "detail/index",
           "style": {
-            "navigationBarTitleText": "详细报告",
+            "navigationBarTitleText": "报告",
             "navigationBarBackgroundColor": "#1a0533",
             "navigationBarTextStyle": "white",
             "backgroundColor": "#0d0118"
@@ -73,7 +73,7 @@
         {
           "path": "profile/index",
           "style": {
-            "navigationBarTitleText": "个人中心",
+            "navigationBarTitleText": "我的",
             "navigationBarBackgroundColor": "#1a0533",
             "navigationBarTextStyle": "white",
             "backgroundColor": "#0d0118"
@@ -134,7 +134,7 @@
         {
           "path": "landing/index",
           "style": {
-            "navigationBarTitleText": "宁好星图",
+            "navigationBarTitleText": "星图",
             "navigationBarBackgroundColor": "#1a0533",
             "navigationBarTextStyle": "white",
             "backgroundColor": "#0d0118"

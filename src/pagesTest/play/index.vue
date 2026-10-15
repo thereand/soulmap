@@ -314,6 +314,11 @@ watch(
       // 写入 Pinia store（结果页会从这里读）
       testStore.setResult(testResult, guideScores, guideCombo, journey)
 
+      // 清除答题进度存档：避免下次进入测试时 loadProgress 把 currentQuestionIndex
+      // 恢复到 35（最后一题），表现为"重新进入直接跳到最后一章"。
+      // 注意：结果本身已通过 SOULMAP_TEST_RESULT 持久化，不会丢失。
+      engine.clearSavedProgress()
+
       // 延迟跳转结果页
       setTimeout(() => {
         uni.redirectTo({
