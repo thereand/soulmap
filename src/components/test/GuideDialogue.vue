@@ -30,7 +30,7 @@
           }"
           @tap="handleSelect(index)"
         >
-          <text class="option-text">{{ option }}</text>
+          <text class="option-text">{{ option.text }}</text>
         </view>
       </view>
     </view>
