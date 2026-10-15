@@ -279,6 +279,7 @@ export const useTestStore = defineStore('test', () => {
   /**
    * 设置最终结果（由答题页在测试完成时调用）
    * 同时持久化一份到本地存储 SOULMAP_TEST_RESULT，用于刷新恢复
+   * 并追加一条到 SOULMAP_TEST_HISTORY 用于个人中心历史记录展示
    *
    * @param res              - MBTI 测试结果
    * @param guideScores      - 向导亲和度得分（可选）
@@ -307,6 +308,53 @@ export const useTestStore = defineStore('test', () => {
       uni.setStorageSync('SOULMAP_TEST_RESULT', JSON.stringify(storeData))
     } catch (e) {
       console.error('[TestStore] 保存结果失败:', e)
+    }
+
+    // 追加到历史记录（最多保留 50 条，新的在前）
+    try {
+      const raw = uni.getStorageSync('SOULMAP_TEST_HISTORY')
+      const list: any[] = raw ? JSON.parse(raw as string) : []
+      const record = {
+        resultId: res.resultId,
+        personalityType: res.personalityType,
+        dimensionScores: res.dimensionScores,
+        confidence: res.confidence,
+        completedAt: res.completedAt,
+        duration: res.duration,
+        guideCombinationId: guideCombo?.id ?? null,
+        selectedZodiac: selectedZodiac.value,
+      }
+      // 去重（同一 resultId 只保留一份）
+      const filtered = list.filter((item) => item.resultId !== record.resultId)
+      const next = [record, ...filtered].slice(0, 50)
+      uni.setStorageSync('SOULMAP_TEST_HISTORY', JSON.stringify(next))
+    } catch (e) {
+      console.warn('[TestStore] 追加历史记录失败:', e)
+    }
+  }
+
+  /**
+   * 读取测试历史记录（本地，最多 50 条）
+   */
+  function getHistory(): any[] {
+    try {
+      const raw = uni.getStorageSync('SOULMAP_TEST_HISTORY')
+      if (!raw) return []
+      const arr = JSON.parse(raw as string)
+      return Array.isArray(arr) ? arr : []
+    } catch {
+      return []
+    }
+  }
+
+  /**
+   * 清空测试历史（个人中心"清除记录"按钮调用）
+   */
+  function clearHistory(): void {
+    try {
+      uni.removeStorageSync('SOULMAP_TEST_HISTORY')
+    } catch {
+      /* noop */
     }
   }
 
@@ -506,6 +554,8 @@ export const useTestStore = defineStore('test', () => {
     submitTest,
     setResult,
     hydrateResultFromStorage,
+    getHistory,
+    clearHistory,
     setTestMode,
     setSelectedGuide,
     setSelectedZodiac,

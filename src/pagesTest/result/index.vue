@@ -168,29 +168,31 @@
         </view>
       </view>
 
-      <!-- ===== 付费墙区域 ===== -->
+      <!-- ===== 付费墙区域（受 PAID_ENABLED 特性开关控制） ===== -->
       <view class="result-section result-section--paywall">
-        <view class="paywall-divider">
-          <view class="paywall-divider__line" />
-          <text class="paywall-divider__text">深度解读</text>
-          <view class="paywall-divider__line" />
-        </view>
+        <template v-if="showPaywallSection">
+          <view class="paywall-divider">
+            <view class="paywall-divider__line" />
+            <text class="paywall-divider__text">深度解读</text>
+            <view class="paywall-divider__line" />
+          </view>
 
-        <!-- 限时优惠倒计时 -->
-        <TimedOffer
-          :scope="personalityData?.code || 'default'"
-          @purchase="handleTimedPurchase"
-        />
+          <!-- 限时优惠倒计时 -->
+          <TimedOffer
+            :scope="personalityData?.code || 'default'"
+            @purchase="handleTimedPurchase"
+          />
 
-        <PayWall
-          :price="9.9"
-          :original-price="19.9"
-          :purchase-count="23847"
-          :time-limit="30"
-          @purchase="handlePurchase"
-        />
+          <PayWall
+            :price="9.9"
+            :original-price="19.9"
+            :purchase-count="0"
+            :time-limit="30"
+            @purchase="handlePurchase"
+          />
+        </template>
 
-        <!-- 分享裂变 Banner -->
+        <!-- 分享裂变 Banner（邀请机制独立于付费，保留） -->
         <InviteBanner
           :target-count="inviteThreshold"
           :personality-name="personalityData?.name || '你的星灵'"
@@ -229,7 +231,7 @@
           <text class="share-btn__text">分享给好友</text>
         </view>
         <text class="footer-note">
-          已有 23,847 位同类型星灵解锁了深度解读
+          {{ showPaywallSection ? '众多同类型星灵已解锁深度解读，你也可以' : '当前版本所有深度解读均可免费查看' }}
         </text>
       </view>
 
@@ -262,7 +264,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { onLoad } from '@dcloudio/uni-app'
+import { onLoad, onShareAppMessage } from '@dcloudio/uni-app'
 import { useTestStore } from '@/stores/test'
 import { personalityTypes } from '@/data/results/types'
 import { freeReports } from '@/data/results/free-reports'
@@ -277,16 +279,22 @@ import PayWall from '@/components/payment/PayWall.vue'
 import TimedOffer from '@/components/payment/TimedOffer.vue'
 import InviteBanner from '@/components/shared/InviteBanner.vue'
 import { useInvite } from '@/composables/useInvite'
+import { usePayment } from '@/composables/usePayment'
 import { useABTest } from '@/composables/useABTest'
 import { useSubscribe } from '@/composables/useSubscribe'
 import { useAtlas } from '@/composables/useAtlas'
 import { track, AnalyticsEvent, trackPageView } from '@/utils/analytics'
+import { PAYWALL_ENABLED, TIMED_OFFER_ENABLED } from '@/config/features'
 
 const testStore = useTestStore()
 const invite = useInvite()
 const ab = useABTest()
 const subscribe = useSubscribe()
 const atlas = useAtlas()
+const payment = usePayment()
+
+/** 是否展示付费墙区块（含分隔 + 倒计时 + PayWall；邀请横幅独立保留） */
+const showPaywallSection = computed(() => PAYWALL_ENABLED || TIMED_OFFER_ENABLED)
 
 /** 新解锁的图鉴卡片 */
 const newlyUnlockedCards = ref<string[]>([])
@@ -484,35 +492,63 @@ function getStarStyle(n: number) {
 }
 
 /** 处理购买（PayWall） */
-function handlePurchase() {
+async function handlePurchase() {
+  if (payment.isLoading.value) return
+  const resultId = testStore.result?.resultId
+  if (!resultId) {
+    uni.showToast({ title: '测试结果未就绪，请稍后重试', icon: 'none' })
+    return
+  }
+
   track(AnalyticsEvent.PAY_CLICK, {
-    productType: 'report_unlock',
+    productType: 'basic',
     price: 9.9,
     from: 'paywall',
   })
   ab.trackConversion('price_test_v1', 'pay_click')
   ab.trackConversion('paywall_copy_v1', 'pay_click')
-  uni.showToast({
-    title: '支付功能即将上线',
-    icon: 'none',
-    duration: 2000,
-  })
+
+  const ok = await payment.payForReport(resultId, 'basic')
+  if (ok) {
+    track(AnalyticsEvent.PAY_SUCCESS, { productType: 'basic', price: 9.9, from: 'paywall' })
+    // 支付成功后跳转详情页查看完整报告
+    uni.navigateTo({
+      url: `/pagesReport/detail/index?resultType=${testStore.result?.personalityType || ''}`,
+    })
+  } else if (payment.payError.value) {
+    track(AnalyticsEvent.PAY_FAIL, { productType: 'basic', errMsg: payment.payError.value })
+    uni.showToast({ title: payment.payError.value || '支付未完成', icon: 'none', duration: 2500 })
+  }
 }
 
 /** 处理限时优惠购买（TimedOffer） */
-function handleTimedPurchase(price: number, tierId: string) {
+async function handleTimedPurchase(price: number, tierId: string) {
+  if (payment.isLoading.value) return
+  const resultId = testStore.result?.resultId
+  if (!resultId) {
+    uni.showToast({ title: '测试结果未就绪，请稍后重试', icon: 'none' })
+    return
+  }
+
   track(AnalyticsEvent.PAY_CLICK, {
-    productType: 'report_unlock_timed',
+    productType: 'basic',
     price,
     tierId,
     from: 'timed_offer',
   })
   ab.trackConversion('countdown_duration_v1', 'pay_click', { price, tierId })
-  uni.showToast({
-    title: '支付功能即将上线',
-    icon: 'none',
-    duration: 2000,
-  })
+
+  // 限时优惠实际下单仍走 basic 产品（¥9.9），前端档位仅作为营销展示
+  const ok = await payment.payForReport(resultId, 'basic')
+  if (ok) {
+    track(AnalyticsEvent.PAY_SUCCESS, { productType: 'basic', price, tierId })
+    uni.navigateTo({
+      url: `/pagesReport/detail/index?resultType=${testStore.result?.personalityType || ''}`,
+    })
+  } else if (payment.payError.value) {
+    track(AnalyticsEvent.PAY_FAIL, { productType: 'basic', errMsg: payment.payError.value })
+    uni.showToast({ title: payment.payError.value || '支付未完成', icon: 'none', duration: 2500 })
+  }
 }
 
 /** 分享按钮 */
@@ -528,6 +564,21 @@ function handleShare() {
 function handleClosePoster() {
   showPoster.value = false
 }
+
+// 页面级分享（右上角「...」→「转发」）：携带邀请码，使被分享者进入时绑定邀请关系
+onShareAppMessage(() => {
+  const code = invite.myInviteCode.value || invite.generateLocalInviteCode()
+  const name = personalityData.value?.name || '你的星灵'
+  track(AnalyticsEvent.SHARE_CLICK, {
+    shareType: 'result_top_menu',
+    inviteCode: code,
+    resultType: testStore.result?.personalityType || '',
+  })
+  return {
+    title: `我的灵魂星灵是「${name}」，来测测你的！`,
+    path: `/pages/index/index?inviteCode=${code}`,
+  }
+})
 
 /** 邀请横幅：拉起分享 */
 function handleInviteShare(payload: { inviteCode: string; title: string; path: string }) {

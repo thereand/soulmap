@@ -80,8 +80,8 @@
       </view>
     </view>
 
-    <!-- 社会认同 -->
-    <view class="paywall__social-proof">
+    <!-- 社会认同（仅在真实数据 > 0 时展示，避免虚假宣传合规风险） -->
+    <view v-if="purchaseCount > 0" class="paywall__social-proof">
       <view class="paywall__avatars">
         <view
           v-for="n in 5"
@@ -116,7 +116,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   price: 9.9,
   originalPrice: 19.9,
-  purchaseCount: 23847,
+  purchaseCount: 0,
   timeLimit: 30,
 })
 

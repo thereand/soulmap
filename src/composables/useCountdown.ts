@@ -23,11 +23,11 @@ export interface OfferTier {
   label?: string
 }
 
-/** 默认三档优惠 */
+/** 默认三档优惠（与后端 PRODUCT_PRICES.basic = ¥9.9 对齐，避免价格不一致） */
 export const DEFAULT_OFFER_TIERS: OfferTier[] = [
-  { id: 'first_30min', price: 6.9, originalPrice: 19.9, durationMs: 30 * 60 * 1000, label: '首单专享' },
-  { id: 'day2', price: 8.9, originalPrice: 19.9, durationMs: 24 * 60 * 60 * 1000, label: '限时特惠' },
-  { id: 'final', price: 5.9, originalPrice: 19.9, durationMs: 48 * 60 * 60 * 1000, label: '最终特惠' },
+  { id: 'first_30min', price: 9.9, originalPrice: 19.9, durationMs: 30 * 60 * 1000, label: '首单专享' },
+  { id: 'day1', price: 12.9, originalPrice: 19.9, durationMs: 24 * 60 * 60 * 1000, label: '限时特惠' },
+  { id: 'final', price: 14.9, originalPrice: 19.9, durationMs: 48 * 60 * 60 * 1000, label: '最终特惠' },
 ]
 
 /** 本地存储键 */

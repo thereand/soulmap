@@ -41,6 +41,35 @@ exports.main = async (event, context) => {
     return { success: false, errMsg: '未获取到用户身份' }
   }
 
+  // 支持 post-payment 校验：action='verifyOrder'
+  if (event.action === 'verifyOrder') {
+    const orderId = String(event.orderId || '')
+    if (!orderId) return { success: false, errMsg: '缺少 orderId' }
+    try {
+      const res = await db.collection('orders')
+        .where({ orderId, userId: openid })
+        .limit(1)
+        .get()
+      if (!res.data || res.data.length === 0) {
+        return { success: false, errMsg: '订单不存在' }
+      }
+      const o = res.data[0]
+      return {
+        success: true,
+        data: {
+          orderId: o.orderId,
+          status: o.status,
+          amount: o.amount,
+          paidAt: o.paidAt || 0,
+          productId: o.productId,
+          resultId: o.resultId,
+        },
+      }
+    } catch (e) {
+      return { success: false, errMsg: 'verifyOrder 失败' }
+    }
+  }
+
   const { resultId, productType } = event
 
   if (!resultId || !productType) {
@@ -135,33 +164,43 @@ exports.main = async (event, context) => {
 
     // 调用微信支付统一下单
     let payParams = null
+    const subMchId = process.env.SUB_MCH_ID || ''
     try {
-      const payRes = await cloud.cloudPay.unifiedOrder({
-        body: `灵魂星图 - ${PRODUCT_NAMES[productType]}`,
-        outTradeNo: orderId,
-        spbillCreateIp: '127.0.0.1',
-        subMchId: '', // TODO: 填入子商户号
-        totalFee: amount,
-        envId: cloud.DYNAMIC_CURRENT_ENV,
-        functionName: 'payCallback', // 支付回调云函数
-        nonceStr: generateNonceStr(),
-        tradeType: 'JSAPI',
-      })
-
-      if (payRes && payRes.payment) {
-        payParams = payRes.payment
-        // 更新订单状态为 paying
-        await db.collection('orders').where({ orderId }).update({
-          data: { status: 'paying', updatedAt: Date.now() }
+      if (!subMchId) {
+        // 未配置商户号时进入开发模式：前端识别 devMode 后模拟支付成功
+        console.warn('[createOrder] 未配置 SUB_MCH_ID 环境变量，启用 devMode')
+        payParams = {
+          orderId,
+          amount,
+          devMode: true,
+        }
+      } else {
+        const payRes = await cloud.cloudPay.unifiedOrder({
+          body: `灵魂星图 - ${PRODUCT_NAMES[productType]}`,
+          outTradeNo: orderId,
+          spbillCreateIp: '127.0.0.1',
+          subMchId,
+          totalFee: amount,
+          envId: cloud.DYNAMIC_CURRENT_ENV,
+          functionName: 'payCallback', // 支付回调云函数
+          nonceStr: generateNonceStr(),
+          tradeType: 'JSAPI',
         })
+
+        if (payRes && payRes.payment) {
+          payParams = payRes.payment
+          // 更新订单状态为 paying
+          await db.collection('orders').where({ orderId }).update({
+            data: { status: 'paying', payParams, updatedAt: Date.now() }
+          })
+        }
       }
     } catch (payErr) {
       console.error('[createOrder] 统一下单失败:', payErr)
-      // 开发阶段：即使下单失败也返回订单信息（方便调试）
+      // 下单异常时回退到开发模式
       payParams = {
         orderId,
         amount,
-        // 开发模式标记
         devMode: true,
       }
     }

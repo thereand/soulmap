@@ -89,6 +89,25 @@ exports.main = async (event, context) => {
         })
     }
 
+    // 对比报告：额外更新 comparisons 集合的 isPaid 标记
+    // 支付完成后，双方都能看到详细对比内容
+    if (order.productId === 'comparison' && order.compareCode) {
+      try {
+        await db.collection('comparisons')
+          .where({ compareCode: order.compareCode })
+          .update({
+            data: {
+              isPaid: true,
+              paidAt: now,
+              paidBy: order.userId,
+              paidOrderId: order.orderId,
+            },
+          })
+      } catch (e) {
+        console.error('[payCallback] 更新 comparisons.isPaid 失败:', e)
+      }
+    }
+
     console.log('[payCallback] 订单处理成功:', {
       orderId: outTradeNo,
       transactionId,

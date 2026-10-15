@@ -136,11 +136,15 @@
 import { computed, ref, onMounted } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { useCompare, type ComparePartner } from '@/composables/useCompare'
+import { usePayment } from '@/composables/usePayment'
 import { useTestStore } from '@/stores/test'
 import { personalityTypes } from '@/data/results/types'
+import { callCloud } from '@/services/cloud'
 import { trackPageView, track, AnalyticsEvent } from '@/utils/analytics'
+import { COMPARE_PAID_ENABLED } from '@/config/features'
 
 const compareLogic = useCompare()
+const payment = usePayment()
 const testStore = useTestStore()
 
 const compareCode = ref('')
@@ -154,7 +158,14 @@ const userB = computed<ComparePartner | null>(() => record.value?.userB || null)
 const hasPartner = computed(() => !!(userA.value && userB.value))
 const compatibility = computed(() => record.value?.compatibility ?? report.value?.overallScore ?? 0)
 const relationLabel = computed(() => record.value?.relationLabel || report.value?.relationLabel || '灵魂知己')
-const isPaid = computed(() => !!record.value?.isPaid)
+/** 对比报告是否已解锁
+ *  - COMPARE_PAID_ENABLED=false：强制视为已解锁，直接展示完整对比内容
+ *  - COMPARE_PAID_ENABLED=true：跟随云端 comparisons.isPaid 字段
+ */
+const isPaid = computed(() => {
+  if (!COMPARE_PAID_ENABLED) return true
+  return !!record.value?.isPaid
+})
 
 const paidBenefits = [
   '四维度详细对比分析',
@@ -246,24 +257,69 @@ onMounted(() => {
 })
 
 async function handleUnlock() {
+  if (payment.isLoading.value) return
+
   track(AnalyticsEvent.PAY_CLICK, {
     productType: 'compare_report',
     price: 19.9,
     compareCode: compareCode.value,
   })
+
+  const resultId = testStore.result?.resultId
+  if (!resultId) {
+    uni.showToast({ title: '测试结果未就绪', icon: 'none' })
+    return
+  }
+
   uni.showModal({
     title: '解锁灵魂契合详细报告',
-    content: '本次为 ¥19.9，解锁后双方都可查看详细内容。',
-    confirmText: '立即解锁',
+    content: '本次支付 ¥19.9，解锁后双方都可查看详细内容。',
+    confirmText: '立即支付',
     success: async (res) => {
-      if (res.confirm) {
-        // 支付流程占位：真正的支付通过 createOrder 云函数触发，成功后回调 markPaid
-        // 此处直接尝试 markPaid 作为演示 / H5 兜底
-        const ok = await compareLogic.unlockPaidReport(compareCode.value)
-        uni.showToast({
-          title: ok ? '已解锁，向下滚动查看' : '支付流程即将上线',
-          icon: ok ? 'success' : 'none',
+      if (!res.confirm) return
+
+      try {
+        // Step 1: 创建对比付费订单
+        const orderRes = await callCloud<any>('compare', {
+          action: 'createPayOrder',
+          compareCode: compareCode.value,
+          resultId,
         })
+        if (!orderRes.success || !orderRes.data) {
+          uni.showToast({ title: orderRes.errMsg || '创建订单失败', icon: 'none' })
+          return
+        }
+
+        // Step 2: 调起支付（复用 usePayment.payWithOrder）
+        const ok = await payment.payWithOrder(orderRes.data)
+
+        if (ok) {
+          track(AnalyticsEvent.COMPARE_PAY, {
+            compareCode: compareCode.value,
+            amount: 19.9,
+            orderId: orderRes.data.orderId,
+          })
+
+          // Step 3: 通知后端翻转 isPaid（payCallback 也会做，这里作为双保险）
+          await callCloud('compare', {
+            action: 'markPaid',
+            compareCode: compareCode.value,
+            resultId,
+          })
+
+          // Step 4: 重新加载对比记录，刷新页面
+          await compareLogic.loadCompare(compareCode.value)
+          uni.showToast({ title: '已解锁', icon: 'success' })
+        } else if (payment.payError.value) {
+          track(AnalyticsEvent.PAY_FAIL, {
+            productType: 'compare_report',
+            errMsg: payment.payError.value,
+          })
+          uni.showToast({ title: payment.payError.value || '支付未完成', icon: 'none', duration: 2500 })
+        }
+      } catch (e: any) {
+        console.error('[Compare] 支付流程异常:', e)
+        uni.showToast({ title: '支付流程异常，请重试', icon: 'none' })
       }
     },
   })

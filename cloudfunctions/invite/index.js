@@ -194,6 +194,44 @@ exports.main = async (event) => {
       return { success: true, data: { rewardKey } }
     }
 
+    /**
+     * 获取当前用户的最近被邀请人列表（最近 20 条，仅展示已完成的）
+     * 返回：{ list: [{ nickname, personalityType, completedAt }] }
+     */
+    if (action === 'getInviteList') {
+      const invRes = await db.collection('invitations')
+        .where({ inviterOpenid: openid, inviteeCompleted: true })
+        .orderBy('completedAt', 'desc')
+        .limit(20)
+        .get()
+      if (!invRes.data || invRes.data.length === 0) {
+        return { success: true, data: { list: [] } }
+      }
+
+      const inviteeOpenids = invRes.data.map((r) => r.inviteeOpenid)
+      // 批量查询 users 拿昵称与 latestType
+      const usersRes = await db.collection('users')
+        .where({ _openid: _.in(inviteeOpenids) })
+        .field({ _openid: true, nickname: true, latestType: true })
+        .get()
+      const userMap = {}
+      (usersRes.data || []).forEach((u) => {
+        userMap[u._openid] = {
+          nickname: u.nickname || '星旅者',
+          personalityType: u.latestType || '',
+        }
+      })
+
+      const list = invRes.data.map((r) => ({
+        inviteeOpenid: r.inviteeOpenid,
+        completedAt: r.completedAt || 0,
+        nickname: (userMap[r.inviteeOpenid] && userMap[r.inviteeOpenid].nickname) || '星旅者',
+        personalityType: (userMap[r.inviteeOpenid] && userMap[r.inviteeOpenid].personalityType) || '',
+      }))
+
+      return { success: true, data: { list } }
+    }
+
     return { success: false, errMsg: '不支持的 action: ' + action }
   } catch (err) {
     console.error('[invite] error:', err)

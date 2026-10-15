@@ -80,8 +80,72 @@
         <text class="landing-empty__text">这颗星灵似乎迷失了方向…</text>
       </view>
 
-      <!-- 好奇心引导 -->
-      <view class="landing-hook">
+      <!-- 默认状态（未携带 type 参数时展示通用星灵视觉） -->
+      <view v-else class="landing-default">
+        <view class="landing-default__orb">
+          <view class="landing-default__orb-ring" />
+          <view class="landing-default__orb-core" />
+          <view class="landing-default__orb-dot landing-default__orb-dot--1" />
+          <view class="landing-default__orb-dot landing-default__orb-dot--2" />
+          <view class="landing-default__orb-dot landing-default__orb-dot--3" />
+        </view>
+        <text class="landing-default__title">发现你的灵魂星灵</text>
+        <text class="landing-default__sub">5 分钟沉浸测试，看见你的灵魂形状</text>
+      </view>
+
+      <!-- 功能亮点三卡 -->
+      <view class="features">
+        <view class="features__item">
+          <view class="features__icon">🧠</view>
+          <text class="features__title">MBTI 深度解析</text>
+          <text class="features__desc">基于 36 道题的双轨评分，精准定位你的人格类型与四维度置信度</text>
+        </view>
+        <view class="features__item">
+          <view class="features__icon">✨</view>
+          <text class="features__title">四大星灵向导</text>
+          <text class="features__desc">烈焰 / 深渊 / 森林 / 星辰，找到与你灵魂共振的向导组合</text>
+        </view>
+        <view class="features__item">
+          <view class="features__icon">♈</view>
+          <text class="features__title">星座融合解读</text>
+          <text class="features__desc">12 星座 × MBTI 的共鸣、反差、互补三模式专属解读</text>
+        </view>
+      </view>
+
+      <!-- 报告预览轮播 -->
+      <view class="preview">
+        <text class="preview__title">你将获得的深度报告</text>
+        <scroll-view scroll-x class="preview__scroll">
+          <view class="preview__list">
+            <view class="preview__card" v-for="p in previewCards" :key="p.title">
+              <text class="preview__card-emoji">{{ p.emoji }}</text>
+              <text class="preview__card-title">{{ p.title }}</text>
+              <text class="preview__card-desc">{{ p.desc }}</text>
+            </view>
+          </view>
+        </scroll-view>
+      </view>
+
+      <!-- 社会证明 -->
+      <view class="proof">
+        <view class="proof__item">
+          <text class="proof__num">16</text>
+          <text class="proof__label">种人格类型</text>
+        </view>
+        <view class="proof__sep" />
+        <view class="proof__item">
+          <text class="proof__num">15</text>
+          <text class="proof__label">种星灵组合</text>
+        </view>
+        <view class="proof__sep" />
+        <view class="proof__item">
+          <text class="proof__num">12</text>
+          <text class="proof__label">星座融合</text>
+        </view>
+      </view>
+
+      <!-- 好奇心引导（仅当分享者类型已知时展示） -->
+      <view v-if="personalityData" class="landing-hook">
         <text class="landing-hook__text">你和 TA 是什么灵魂关系？</text>
         <text class="landing-hook__sub">每个人的灵魂星灵都独一无二</text>
       </view>
@@ -111,18 +175,28 @@ import { ref, computed, onMounted } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { personalityTypes, type PersonalityTypeData } from '@/data/results/types'
 import { useTestStore } from '@/stores/test'
+import { useInvite } from '@/composables/useInvite'
 
 /* ===== 状态 ===== */
 
 const typeCode = ref('')
+const inviteCodeFromUrl = ref('')
 const personalityData = ref<PersonalityTypeData | null>(null)
 const testStore = useTestStore()
+const invite = useInvite()
 
 /* ===== 元素图标映射 ===== */
 
 const elementIcons: Record<string, string> = {
   '火': '🔥', '水': '💧', '风': '🌪', '土': '🌍', '光': '✨', '暗': '🌑',
 }
+
+/* ===== 报告预览卡片 ===== */
+const previewCards = [
+  { emoji: '🧠', title: '深度性格分析', desc: '500 字核心剖析，看见你人格的骨架与驱动力' },
+  { emoji: '💫', title: '内心世界揭秘', desc: '你的灵魂深处藏着哪些未被看见的渴望与恐惧' },
+  { emoji: '💼', title: '职业发展建议', desc: '结合 MBTI 与星灵向导，给出最契合你的方向' },
+]
 
 const elementIcon = computed(() => {
   if (!personalityData.value) return '⭐'
@@ -214,17 +288,29 @@ onLoad((options) => {
       personalityData.value = data
     }
   }
-  console.log('[Page] 分享落地页加载, type:', typeCode.value)
+
+  // 裂变关键：从 URL 读取邀请码并登记关系
+  const inv = options?.invite || options?.inviteCode || ''
+  if (inv) {
+    inviteCodeFromUrl.value = inv
+    // 异步登记，不阻塞首屏渲染
+    invite.registerAsInvitee(inv).catch((e) => {
+      console.warn('[Landing] registerAsInvitee 失败:', e)
+    })
+  }
+
+  console.log('[Page] 分享落地页加载, type:', typeCode.value, 'invite:', inviteCodeFromUrl.value)
 })
 
 /* ===== 事件 ===== */
 
 function handleStartTest(): void {
-  // 开始新测试
+  // 开始新测试；把入口邀请码透传到 intro 页，便于后续链路再次登记
   testStore.resetTest()
   testStore.startTest()
+  const inv = inviteCodeFromUrl.value ? `&inviteCode=${inviteCodeFromUrl.value}` : ''
   uni.navigateTo({
-    url: '/pagesTest/intro/index?from=share',
+    url: `/pagesTest/intro/index?from=share${inv}`,
   })
 }
 
@@ -603,5 +689,257 @@ onShareAppMessage(() => {
 @keyframes ctaPulse {
   0%, 100% { opacity: 0.3; transform: scale(1); }
   50% { opacity: 0.6; transform: scale(1.1); }
+}
+
+@keyframes orbFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20rpx); }
+}
+
+@keyframes ringRotate {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+@keyframes orbitMove1 {
+  from { transform: rotate(0deg) translateX(160rpx) rotate(0deg); }
+  to { transform: rotate(360deg) translateX(160rpx) rotate(-360deg); }
+}
+@keyframes orbitMove2 {
+  from { transform: rotate(120deg) translateX(200rpx) rotate(-120deg); }
+  to { transform: rotate(480deg) translateX(200rpx) rotate(-480deg); }
+}
+@keyframes orbitMove3 {
+  from { transform: rotate(240deg) translateX(140rpx) rotate(-240deg); }
+  to { transform: rotate(600deg) translateX(140rpx) rotate(-600deg); }
+}
+
+/* ===== 默认状态（无 type 参数）===== */
+.landing-default {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: $spacing-xl;
+  animation: fadeSlideUp 0.8s ease 0.2s both;
+
+  &__orb {
+    width: 320rpx;
+    height: 320rpx;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: orbFloat 4s ease-in-out infinite;
+    margin-bottom: $spacing-lg;
+  }
+
+  &__orb-core {
+    width: 180rpx;
+    height: 180rpx;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #8b5cf6, #6c3ce0 40%, #3b1a8e 70%, #1a0533);
+    box-shadow:
+      0 0 60rpx rgba(108, 60, 224, 0.5),
+      0 0 120rpx rgba(108, 60, 224, 0.2),
+      inset -20rpx -20rpx 40rpx rgba(0, 0, 0, 0.4);
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 18%;
+      left: 22%;
+      width: 40rpx;
+      height: 30rpx;
+      background: radial-gradient(ellipse, rgba(255, 255, 255, 0.6), transparent);
+      border-radius: 50%;
+      filter: blur(4rpx);
+    }
+  }
+
+  &__orb-ring {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 300rpx;
+    height: 300rpx;
+    border: 2rpx dashed rgba(108, 60, 224, 0.3);
+    border-radius: 50%;
+    animation: ringRotate 20s linear infinite;
+  }
+
+  &__orb-dot {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 12rpx;
+    height: 12rpx;
+    margin: -6rpx;
+    border-radius: 50%;
+    background: $accent-gold;
+    box-shadow: 0 0 16rpx rgba(255, 215, 0, 0.8);
+
+    &--1 { animation: orbitMove1 8s linear infinite; }
+    &--2 { animation: orbitMove2 12s linear infinite; }
+    &--3 { animation: orbitMove3 10s linear infinite; }
+  }
+
+  &__title {
+    font-size: $font-xl;
+    font-weight: 800;
+    color: $text-primary;
+    letter-spacing: 4rpx;
+    text-align: center;
+    margin-bottom: $spacing-xs;
+  }
+
+  &__sub {
+    font-size: $font-sm;
+    color: $text-muted;
+    letter-spacing: 2rpx;
+    text-align: center;
+  }
+}
+
+/* ===== 功能亮点 ===== */
+.features {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+  margin-bottom: $spacing-xl;
+  animation: fadeSlideUp 0.8s ease 0.3s both;
+
+  &__item {
+    padding: $spacing-lg;
+    border-radius: $radius-xl;
+    background: linear-gradient(145deg, rgba(108, 60, 224, 0.1), rgba(26, 5, 51, 0.6));
+    border: 1rpx solid rgba(108, 60, 224, 0.2);
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+    transition: transform 0.2s ease;
+
+    &:active { transform: scale(0.98); }
+  }
+
+  &__icon {
+    font-size: 48rpx;
+    margin-bottom: $spacing-xs;
+  }
+
+  &__title {
+    font-size: $font-md;
+    font-weight: 700;
+    color: $text-primary;
+    letter-spacing: 2rpx;
+  }
+
+  &__desc {
+    font-size: $font-sm;
+    color: $text-secondary;
+    line-height: 1.7;
+    letter-spacing: 1rpx;
+  }
+}
+
+/* ===== 报告预览 ===== */
+.preview {
+  width: 100%;
+  margin-bottom: $spacing-xl;
+  animation: fadeSlideUp 0.8s ease 0.4s both;
+
+  &__title {
+    display: block;
+    font-size: $font-md;
+    font-weight: 700;
+    color: $text-primary;
+    letter-spacing: 2rpx;
+    margin-bottom: $spacing-md;
+    padding: 0 $spacing-xs;
+  }
+
+  &__scroll {
+    width: 100%;
+    white-space: nowrap;
+  }
+
+  &__list {
+    display: inline-flex;
+    gap: $spacing-md;
+    padding: 0 $spacing-xs;
+  }
+
+  &__card {
+    display: inline-flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+    width: 480rpx;
+    padding: $spacing-lg;
+    border-radius: $radius-xl;
+    background: linear-gradient(145deg, rgba(255, 215, 0, 0.08), rgba(108, 60, 224, 0.1));
+    border: 1rpx solid rgba(255, 215, 0, 0.2);
+    white-space: normal;
+    vertical-align: top;
+  }
+
+  &__card-emoji {
+    font-size: 56rpx;
+  }
+
+  &__card-title {
+    font-size: $font-md;
+    font-weight: 700;
+    color: $accent-gold;
+    letter-spacing: 2rpx;
+  }
+
+  &__card-desc {
+    font-size: $font-sm;
+    color: $text-secondary;
+    line-height: 1.7;
+  }
+}
+
+/* ===== 社会证明 ===== */
+.proof {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: $spacing-lg;
+  background: $bg-card;
+  border: 1rpx solid rgba(255, 255, 255, 0.06);
+  border-radius: $radius-xl;
+  margin-bottom: $spacing-xl;
+  animation: fadeSlideUp 0.8s ease 0.45s both;
+
+  &__item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6rpx;
+  }
+
+  &__num {
+    font-size: $font-xl;
+    font-weight: 800;
+    color: $accent-gold;
+    letter-spacing: 1rpx;
+  }
+
+  &__label {
+    font-size: $font-xs;
+    color: $text-muted;
+    letter-spacing: 2rpx;
+  }
+
+  &__sep {
+    width: 1rpx;
+    height: 48rpx;
+    background: rgba(255, 255, 255, 0.08);
+  }
 }
 </style>

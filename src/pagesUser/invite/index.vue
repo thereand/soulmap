@@ -26,29 +26,72 @@
           'tier-row--claimed': claimed.includes(tier.key),
         }"
       >
-        <view class="tier-row__left">
-          <view class="tier-row__badge">
-            <text class="tier-row__badge-text">{{ tier.count }} 人</text>
+        <view class="tier-row__head">
+          <view class="tier-row__badge" :style="{ background: tierColor(tier.count) + '22', borderColor: tierColor(tier.count) + '55' }">
+            <text class="tier-row__badge-text" :style="{ color: tierColor(tier.count) }">{{ tier.count }} 人</text>
           </view>
           <text class="tier-row__label">{{ tier.label }}</text>
         </view>
+
+        <view class="tier-row__progress">
+          <view class="tier-row__track">
+            <view
+              class="tier-row__fill"
+              :style="{
+                width: Math.min(100, (Math.min(invited, tier.count) / tier.count) * 100) + '%',
+                background: tierColor(tier.count),
+              }"
+            />
+          </view>
+          <text class="tier-row__progress-text">{{ Math.min(invited, tier.count) }}/{{ tier.count }}</text>
+        </view>
+
         <view class="tier-row__action">
           <view
             v-if="claimed.includes(tier.key)"
             class="tier-row__done"
           >
-            <text class="tier-row__done-text">已解锁</text>
+            <text class="tier-row__done-text">✓ 已解锁</text>
           </view>
           <view
             v-else-if="invited >= tier.count"
             class="tier-row__btn"
+            :style="{ background: `linear-gradient(135deg, ${tierColor(tier.count)}, ${tierColor(tier.count)}cc)` }"
             @tap="handleClaim(tier.key)"
           >
-            <text class="tier-row__btn-text">领取</text>
+            <text class="tier-row__btn-text">立即领取</text>
           </view>
           <text v-else class="tier-row__gap">
             还差 {{ tier.count - invited }} 人
           </text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 最近邀请列表 -->
+    <view class="invite-page__recent">
+      <text class="invite-page__recent-title">最近邀请</text>
+
+      <view v-if="recentLoading" class="recent__loading">
+        <text class="recent__loading-text">加载中...</text>
+      </view>
+
+      <view v-else-if="recentList.length === 0" class="recent__empty">
+        <text class="recent__empty-emoji">🌟</text>
+        <text class="recent__empty-text">还没有好友完成测试</text>
+        <text class="recent__empty-hint">点击下方按钮邀请第一位好友</text>
+      </view>
+
+      <view v-else class="recent__list">
+        <view v-for="(item, i) in recentList" :key="'r-' + i" class="recent__item">
+          <view class="recent__avatar">
+            <text class="recent__avatar-text">{{ avatarLetterOf(item) }}</text>
+          </view>
+          <view class="recent__body">
+            <text class="recent__name">{{ item.nickname || '星旅者' }}</text>
+            <text class="recent__time">{{ item.completedAt ? formatDate(item.completedAt) : '' }} 完成测试</text>
+          </view>
+          <text v-if="item.personalityType" class="recent__type">{{ item.personalityType }}</text>
         </view>
       </view>
     </view>
@@ -77,6 +120,7 @@ import { onLoad } from '@dcloudio/uni-app'
 import { useInvite, REWARD_TIERS } from '@/composables/useInvite'
 import { useTestStore } from '@/stores/test'
 import { personalityTypes } from '@/data/results/types'
+import { callCloud } from '@/services/cloud'
 import { track, AnalyticsEvent, trackPageView } from '@/utils/analytics'
 
 const invite = useInvite()
@@ -92,6 +136,10 @@ const personalityName = computed(() => {
   return (t && personalityTypes[t]?.name) || '你的星灵'
 })
 
+/** 最近邀请列表状态 */
+const recentLoading = ref(false)
+const recentList = ref<any[]>([])
+
 onLoad(() => {
   trackPageView('pagesUser/invite/index')
 })
@@ -99,7 +147,39 @@ onLoad(() => {
 onMounted(async () => {
   invite.generateLocalInviteCode()
   await invite.loadProgress().catch(() => null)
+  await loadRecent().catch(() => null)
 })
+
+async function loadRecent() {
+  recentLoading.value = true
+  try {
+    const res = await callCloud<{ list: any[] }>('invite', { action: 'getInviteList' })
+    if (res.success && Array.isArray(res.data?.list)) {
+      recentList.value = res.data.list
+    }
+  } finally {
+    recentLoading.value = false
+  }
+}
+
+function tierColor(count: number): string {
+  if (count === 1) return '#4fc3f7'
+  if (count === 3) return '#ffd700'
+  return '#a855f7'
+}
+
+function avatarLetterOf(item: any): string {
+  return (item.nickname || '星').slice(0, 1)
+}
+
+function formatDate(ts: number): string {
+  const d = new Date(ts)
+  const pad = (n: number) => String(n).padStart(2, '0')
+  const now = new Date()
+  return d.getFullYear() === now.getFullYear()
+    ? `${pad(d.getMonth() + 1)}.${pad(d.getDate())}`
+    : `${d.getFullYear()}.${pad(d.getMonth() + 1)}.${pad(d.getDate())}`
+}
 
 async function handleClaim(key: string) {
   const ok = await invite.claimReward(key)
@@ -107,6 +187,7 @@ async function handleClaim(key: string) {
     title: ok ? '奖励已解锁' : '领取失败',
     icon: ok ? 'success' : 'none',
   })
+  if (ok) track(AnalyticsEvent.INVITE_COMPLETE, { rewardKey: key, source: 'invite_page' })
 }
 
 function copyCode() {
@@ -252,8 +333,8 @@ defineExpose({
 
 .tier-row {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: $spacing-sm;
   padding: $spacing-lg;
   border-radius: $radius-lg;
   background: rgba(255, 255, 255, 0.03);
@@ -262,30 +343,29 @@ defineExpose({
 
   &--reached {
     border-color: rgba(255, 215, 0, 0.3);
-    background: rgba(255, 215, 0, 0.08);
+    background: rgba(255, 215, 0, 0.06);
   }
 
   &--claimed {
-    opacity: 0.6;
+    opacity: 0.7;
   }
 
-  &__left {
+  &__head {
     display: flex;
     align-items: center;
     gap: $spacing-md;
-    flex: 1;
   }
 
   &__badge {
-    padding: 6rpx 16rpx;
+    padding: 6rpx 18rpx;
     border-radius: $radius-full;
-    background: rgba(108, 60, 224, 0.2);
-    border: 1rpx solid rgba(108, 60, 224, 0.3);
+    border: 1rpx solid;
+    flex-shrink: 0;
   }
 
   &__badge-text {
     font-size: 22rpx;
-    color: $text-primary;
+    font-weight: 700;
     letter-spacing: 2rpx;
   }
 
@@ -296,36 +376,179 @@ defineExpose({
     line-height: 1.5;
   }
 
+  &--reached &__label {
+    color: $text-primary;
+    font-weight: 600;
+  }
+
+  &__progress {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+  }
+
+  &__track {
+    flex: 1;
+    height: 10rpx;
+    border-radius: 10rpx;
+    background: rgba(255, 255, 255, 0.06);
+    overflow: hidden;
+  }
+
+  &__fill {
+    height: 100%;
+    border-radius: 10rpx;
+    transition: width 0.6s ease;
+  }
+
+  &__progress-text {
+    font-size: $font-xs;
+    color: $text-muted;
+    width: 70rpx;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__action {
+    display: flex;
+    justify-content: flex-end;
+  }
+
   &__done {
-    padding: 6rpx 20rpx;
+    padding: 8rpx 22rpx;
     border-radius: $radius-full;
-    background: rgba(79, 195, 247, 0.15);
+    background: rgba(76, 175, 80, 0.15);
+    border: 1rpx solid rgba(76, 175, 80, 0.3);
   }
 
   &__done-text {
     font-size: 22rpx;
-    color: $accent-blue;
+    color: #66bb6a;
+    font-weight: 600;
   }
 
   &__btn {
     padding: 10rpx 30rpx;
     border-radius: $radius-full;
-    background: linear-gradient(135deg, $accent-gold, #ff9a3c);
+    box-shadow: 0 4rpx 12rpx rgba(255, 215, 0, 0.3);
 
-    &:active {
-      transform: scale(0.95);
-    }
+    &:active { transform: scale(0.95); }
   }
 
   &__btn-text {
     font-size: $font-sm;
     font-weight: 700;
     color: #1a0533;
+    letter-spacing: 2rpx;
   }
 
   &__gap {
     font-size: 22rpx;
     color: $text-muted;
+    padding: 8rpx 22rpx;
+  }
+}
+
+/* ===== 最近邀请 ===== */
+.invite-page__recent {
+  padding: $spacing-lg;
+  border-radius: $radius-xl;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1rpx solid rgba(255, 255, 255, 0.08);
+  margin-bottom: $spacing-xl;
+
+  &__recent-title {
+    display: block;
+    font-size: $font-md;
+    font-weight: 700;
+    color: $text-primary;
+    margin-bottom: $spacing-md;
+    letter-spacing: 2rpx;
+  }
+}
+
+.recent {
+  &__loading, &__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: $spacing-xl 0;
+    gap: $spacing-xs;
+  }
+
+  &__loading-text, &__empty-text {
+    font-size: $font-sm;
+    color: $text-secondary;
+  }
+
+  &__empty-emoji { font-size: 56rpx; }
+
+  &__empty-hint {
+    font-size: $font-xs;
+    color: $text-muted;
+    margin-top: $spacing-xs;
+  }
+
+  &__list { display: flex; flex-direction: column; }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+    padding: $spacing-md 0;
+    border-bottom: 1rpx solid rgba(255, 255, 255, 0.05);
+    &:last-child { border-bottom: none; }
+  }
+
+  &__avatar {
+    width: 72rpx;
+    height: 72rpx;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(108, 60, 224, 0.4), rgba(79, 195, 247, 0.3));
+    border: 2rpx solid rgba(255, 255, 255, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  &__avatar-text {
+    font-size: $font-md;
+    font-weight: 700;
+    color: $text-primary;
+  }
+
+  &__body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4rpx;
+    min-width: 0;
+  }
+
+  &__name {
+    font-size: $font-base;
+    font-weight: 600;
+    color: $text-primary;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__time {
+    font-size: $font-xs;
+    color: $text-muted;
+  }
+
+  &__type {
+    font-size: $font-xs;
+    font-weight: 700;
+    color: $accent-gold;
+    letter-spacing: 2rpx;
+    padding: 4rpx 14rpx;
+    border-radius: $radius-full;
+    background: rgba(255, 215, 0, 0.1);
+    border: 1rpx solid rgba(255, 215, 0, 0.25);
   }
 }
 </style>

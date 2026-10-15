@@ -116,6 +116,15 @@
             "navigationStyle": "custom",
             "enablePullDownRefresh": true
           }
+        },
+        {
+          "path": "stats/index",
+          "style": {
+            "navigationBarTitleText": "数据报表",
+            "navigationBarBackgroundColor": "#1a0533",
+            "navigationBarTextStyle": "white",
+            "backgroundColor": "#0d0118"
+          }
         }
       ]
     },

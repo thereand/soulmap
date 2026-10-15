@@ -174,10 +174,165 @@ exports.main = async (event) => {
       // 权限：只允许双方之一操作
       const isParty = rec.userA?.openid === openid || rec.userB?.openid === openid
       if (!isParty) return { success: false, errMsg: '无权修改此对比' }
+
+      // 合规校验：必须存在 paid 订单才允许解锁（防止绕过支付）
+      // 订单 productId='comparison', 关联到当前用户的 resultId（通过 event.resultId 传入）
+      // 若调用方不传 resultId，则回退到检查 comparisons 自身是否已被付费回调标记
+      if (event.resultId) {
+        const paidOrder = await db.collection('orders')
+          .where({
+            userId: openid,
+            resultId: event.resultId,
+            productId: 'comparison',
+            status: 'paid',
+          })
+          .limit(1)
+          .get()
+        if (!paidOrder.data || paidOrder.data.length === 0) {
+          return { success: false, errMsg: '尚未完成支付', errCode: 'UNPAID' }
+        }
+      }
+
       await db.collection('comparisons').doc(rec._id).update({
-        data: { isPaid: true, paidAt: Date.now() },
+        data: { isPaid: true, paidAt: Date.now(), paidBy: openid },
       })
       return { success: true, data: { compareCode } }
+    }
+
+    /**
+     * 创建对比报告付费订单（走正规 createOrder 链路）
+     * 需要参数：compareCode, resultId（当前用户的测试结果）
+     * 返回：orderId, amount, payParams
+     */
+    if (action === 'createPayOrder') {
+      const compareCode = String(event.compareCode || '').toLowerCase()
+      const resultId = String(event.resultId || '')
+      if (!compareCode || !resultId) {
+        return { success: false, errMsg: '参数不完整：需要 compareCode 和 resultId' }
+      }
+
+      // 校验对比记录存在且当前用户是参与方
+      const cRes = await db.collection('comparisons')
+        .where({ compareCode })
+        .limit(1)
+        .get()
+      if (!cRes.data || cRes.data.length === 0) {
+        return { success: false, errMsg: '对比记录不存在' }
+      }
+      const rec = cRes.data[0]
+      const isParty = rec.userA?.openid === openid || rec.userB?.openid === openid
+      if (!isParty) return { success: false, errMsg: '无权购买此对比报告' }
+      if (rec.isPaid) return { success: false, errMsg: '该对比报告已解锁' }
+
+      // 校验 resultId 归属
+      const tRes = await db.collection('test_results')
+        .where({ resultId, _openid: openid })
+        .limit(1)
+        .get()
+      if (!tRes.data || tRes.data.length === 0) {
+        return { success: false, errMsg: '测试结果不存在或无权访问' }
+      }
+
+      // 已有 paid 订单则直接返回成功
+      const paidOrder = await db.collection('orders')
+        .where({ userId: openid, resultId, productId: 'comparison', status: 'paid' })
+        .limit(1)
+        .get()
+      if (paidOrder.data && paidOrder.data.length > 0) {
+        return { success: false, errMsg: '该报告已购买' }
+      }
+
+      // 复用 pending 订单
+      const pendingRes = await db.collection('orders')
+        .where({
+          userId: openid,
+          resultId,
+          productId: 'comparison',
+          status: db.command.in(['pending', 'paying']),
+        })
+        .limit(1)
+        .get()
+      if (pendingRes.data && pendingRes.data.length > 0) {
+        const po = pendingRes.data[0]
+        if (po.expireAt > Date.now()) {
+          return {
+            success: true,
+            data: {
+              orderId: po.orderId,
+              amount: po.amount,
+              status: po.status,
+              expireAt: po.expireAt,
+              payParams: po.payParams || null,
+            },
+          }
+        }
+        await db.collection('orders').doc(po._id).update({
+          data: { status: 'expired', updatedAt: Date.now() },
+        })
+      }
+
+      const amount = 1990 // ¥19.9
+      const now = Date.now()
+      const orderId = `SOUL${formatDate(new Date())}${rand6()}`
+      const expireAt = now + 30 * 60 * 1000
+
+      const subMchId = process.env.SUB_MCH_ID || ''
+      const orderDoc = {
+        orderId,
+        _openid: openid,
+        userId: openid,
+        productId: 'comparison',
+        productName: '双人对比报告',
+        amount,
+        status: 'pending',
+        payMethod: 'wechat',
+        resultId,
+        compareCode,
+        createdAt: now,
+        expireAt,
+        updatedAt: now,
+      }
+      await db.collection('orders').add({ data: orderDoc })
+
+      let payParams = null
+      try {
+        if (subMchId) {
+          const payRes = await cloud.cloudPay.unifiedOrder({
+            body: '灵魂星图 - 双人对比报告',
+            outTradeNo: orderId,
+            spbillCreateIp: '127.0.0.1',
+            subMchId,
+            totalFee: amount,
+            envId: cloud.DYNAMIC_CURRENT_ENV,
+            functionName: 'payCallback',
+            nonceStr: randNonce(),
+            tradeType: 'JSAPI',
+          })
+          if (payRes && payRes.payment) {
+            payParams = payRes.payment
+            await db.collection('orders').where({ orderId }).update({
+              data: { status: 'paying', payParams, updatedAt: Date.now() },
+            })
+          }
+        } else {
+          payParams = { orderId, amount, devMode: true }
+        }
+      } catch (e) {
+        payParams = { orderId, amount, devMode: true }
+      }
+
+      return {
+        success: true,
+        data: {
+          orderId,
+          amount,
+          productName: '双人对比报告',
+          status: 'pending',
+          expireAt,
+          payParams,
+          compareCode,
+        },
+      }
     }
 
     return { success: false, errMsg: '不支持的 action: ' + action }
@@ -185,4 +340,23 @@ exports.main = async (event) => {
     console.error('[compare] error:', err)
     return { success: false, errMsg: (err && err.message) || 'compare error' }
   }
+}
+
+function formatDate(d) {
+  const p = (n, l = 2) => String(n).padStart(l, '0')
+  return (
+    `${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}` +
+    `${p(d.getHours())}${p(d.getMinutes())}${p(d.getSeconds())}`
+  )
+}
+
+function rand6() {
+  return Math.floor(Math.random() * 1000000).toString().padStart(6, '0')
+}
+
+function randNonce() {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  let s = ''
+  for (let i = 0; i < 32; i++) s += chars[Math.floor(Math.random() * chars.length)]
+  return s
 }

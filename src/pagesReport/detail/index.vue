@@ -123,12 +123,36 @@
         </view>
       </view>
 
-      <!-- 无报告提示 -->
+      <!-- 无报告 / 未付费提示 -->
       <view v-if="!paidReport && !loading" class="no-report">
-        <text class="no-report__text">暂无报告数据</text>
-        <view class="no-report__btn" @tap="goBack">
-          <text class="no-report__btn-text">返回</text>
-        </view>
+        <!-- 未付费：显示锁屏 + 购买 CTA -->
+        <template v-if="!hasAccess && personalityData">
+          <view class="lock-icon-wrap">
+            <text class="lock-icon">🔒</text>
+          </view>
+          <text class="no-report__title">完整报告尚未解锁</text>
+          <text class="no-report__text">
+            购买后可查看深度性格分析、内心世界、社交与恋爱风格、职业建议、成长路径、同类型名人等完整解读。
+          </text>
+          <view class="no-report__price-row">
+            <text class="no-report__original">¥19.9</text>
+            <text class="no-report__current">¥9.9</text>
+          </view>
+          <view class="no-report__btn no-report__btn--primary" @tap="handleBuyBasic">
+            <text class="no-report__btn-text">立即解锁 ¥9.9</text>
+          </view>
+          <view class="no-report__btn" @tap="goBack">
+            <text class="no-report__btn-text">返回结果页</text>
+          </view>
+        </template>
+
+        <!-- 其他情况：无数据 -->
+        <template v-else>
+          <text class="no-report__text">暂无报告数据</text>
+          <view class="no-report__btn" @tap="goBack">
+            <text class="no-report__btn-text">返回</text>
+          </view>
+        </template>
       </view>
 
       <!-- 底部操作区 -->
@@ -146,8 +170,8 @@
           <text class="detail-footer__share-text">分享你的星灵解读给好友</text>
         </view>
 
-        <!-- 追加售卖 -->
-        <view class="upsell-card">
+        <!-- 追加售卖（受 UPSELL_ENABLED 开关控制） -->
+        <view v-if="showUpsell" class="upsell-card">
           <text class="upsell-card__title">🔮 进阶报告</text>
           <text class="upsell-card__desc">
             解锁人格兼容性分析、年度运势预测、专属成长计划
@@ -175,11 +199,42 @@
 import { ref, computed } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { useTestStore } from '@/stores/test'
+import { usePayment } from '@/composables/usePayment'
 import { personalityTypes } from '@/data/results/types'
 import { paidReports } from '@/data/results/paid-reports'
+import { paymentService } from '@/services/payment.service'
+import { PAID_ENABLED, UPSELL_ENABLED } from '@/config/features'
 
 const testStore = useTestStore()
+const payment = usePayment()
 const loading = ref(true)
+
+/** 服务端付费校验结果 */
+const serverUnlocked = ref(false)
+
+/** 是否允许查看完整报告
+ *  - PAID_ENABLED=false：全部免费开放
+ *  - PAID_ENABLED=true：服务端 + 本地双重校验
+ */
+const hasAccess = computed(() => {
+  if (!PAID_ENABLED) return true
+  if (serverUnlocked.value) return true
+  // 本地缓存兜底：允许用户在弱网下查看之前已付费的报告
+  try {
+    const cache = JSON.parse(uni.getStorageSync('soulmap_paid_results') || '{}')
+    return Object.values(cache).some((rec: any) => {
+      const typeMatch = resultTypeParam.value
+        ? rec.productType === resultTypeParam.value
+        : true
+      return typeMatch
+    })
+  } catch {
+    return false
+  }
+})
+
+/** 是否显示追加售卖卡片 */
+const showUpsell = computed(() => PAID_ENABLED && UPSELL_ENABLED)
 
 /** 从路由参数获取结果类型 */
 const resultTypeParam = ref('')
@@ -192,8 +247,9 @@ const personalityData = computed(() => {
   return personalityTypes[typeCode] ?? null
 })
 
-/** 付费报告数据 */
+/** 付费报告数据（仅当 hasAccess 为 true 时才返回） */
 const paidReport = computed(() => {
+  if (!hasAccess.value) return null
   const typeCode = resultTypeParam.value || testStore.result?.personalityType
   if (!typeCode) return null
   return paidReports[typeCode] ?? null
@@ -217,8 +273,7 @@ const heroGlowStyle = computed(() => {
   }
 })
 
-onLoad((options: Record<string, string> | undefined) => {
-  loading.value = false
+onLoad(async (options: Record<string, string> | undefined) => {
   if (options?.resultType) {
     resultTypeParam.value = options.resultType
   } else if (!testStore.result) {
@@ -226,6 +281,19 @@ onLoad((options: Record<string, string> | undefined) => {
     testStore.hydrateResultFromStorage()
   }
   console.log('[Page] 详细报告页加载, 类型:', resultTypeParam.value || testStore.result?.personalityType)
+
+  // 服务端付费校验：调用 getReport 云函数判断是否已购买 basic 报告
+  const resultId = testStore.result?.resultId
+  const typeCode = resultTypeParam.value || testStore.result?.personalityType
+  if (resultId && typeCode) {
+    try {
+      const res = await paymentService.checkPaid(resultId, 'basic')
+      serverUnlocked.value = res === true
+    } catch (e) {
+      console.warn('[Detail] 服务端付费校验失败，回退本地缓存:', e)
+    }
+  }
+  loading.value = false
 })
 
 /** 处理分享 */
@@ -237,13 +305,38 @@ function handleShare() {
   })
 }
 
-/** 处理追加售卖 */
-function handleUpsell() {
-  uni.showToast({
-    title: '进阶报告即将上线',
-    icon: 'none',
-    duration: 2000,
-  })
+/** 处理追加售卖（进阶报告，产品类型为 advanced） */
+async function handleUpsell() {
+  if (payment.isLoading.value) return
+  const resultId = testStore.result?.resultId
+  if (!resultId) {
+    uni.showToast({ title: '测试结果未就绪', icon: 'none' })
+    return
+  }
+
+  const ok = await payment.payForReport(resultId, 'advanced')
+  if (ok) {
+    uni.showToast({ title: '进阶报告已解锁', icon: 'success' })
+  } else if (payment.payError.value) {
+    uni.showToast({ title: payment.payError.value || '支付未完成', icon: 'none', duration: 2500 })
+  }
+}
+
+/** 从锁屏直接购买基础版 */
+async function handleBuyBasic() {
+  if (payment.isLoading.value) return
+  const resultId = testStore.result?.resultId
+  if (!resultId) {
+    uni.showToast({ title: '测试结果未就绪', icon: 'none' })
+    return
+  }
+  const ok = await payment.payForReport(resultId, 'basic')
+  if (ok) {
+    serverUnlocked.value = true
+    uni.showToast({ title: '已解锁', icon: 'success' })
+  } else if (payment.payError.value) {
+    uni.showToast({ title: payment.payError.value || '支付未完成', icon: 'none', duration: 2500 })
+  }
 }
 
 /** 返回 */
@@ -439,11 +532,42 @@ function goBack() {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: $spacing-xl;
+  gap: $spacing-lg;
+  padding: $spacing-xl;
+
+  &__title {
+    font-size: $font-lg;
+    font-weight: 800;
+    color: $text-primary;
+    letter-spacing: 2rpx;
+    text-align: center;
+  }
 
   &__text {
-    font-size: $font-lg;
+    font-size: $font-sm;
+    color: $text-secondary;
+    line-height: 1.8;
+    text-align: center;
+    max-width: 560rpx;
+  }
+
+  &__price-row {
+    display: flex;
+    align-items: baseline;
+    gap: $spacing-md;
+  }
+
+  &__original {
+    font-size: $font-base;
     color: $text-muted;
+    text-decoration: line-through;
+  }
+
+  &__current {
+    font-size: $font-hero;
+    font-weight: 900;
+    color: $accent-gold;
+    letter-spacing: -2rpx;
   }
 
   &__btn {
@@ -451,12 +575,41 @@ function goBack() {
     border-radius: $radius-full;
     background: rgba(108, 60, 224, 0.2);
     border: 1rpx solid rgba(108, 60, 224, 0.3);
+    min-width: 400rpx;
+    text-align: center;
+
+    &--primary {
+      background: linear-gradient(135deg, #ffd700 0%, #ffaa00 100%);
+      border: none;
+      box-shadow: 0 8rpx 24rpx rgba(255, 215, 0, 0.25);
+
+      .no-report__btn-text {
+        color: #1a0533;
+        font-weight: 800;
+      }
+    }
   }
 
   &__btn-text {
     font-size: $font-base;
     color: $text-secondary;
   }
+}
+
+.lock-icon-wrap {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  background: rgba(255, 215, 0, 0.08);
+  border: 2rpx solid rgba(255, 215, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: $spacing-sm;
+}
+
+.lock-icon {
+  font-size: 60rpx;
 }
 
 /* ===== 底部操作区 ===== */

@@ -56,7 +56,7 @@ export const useUserStore = defineStore('user', () => {
 
   /**
    * 微信登录
-   * 获取 code 后调用云函数换取 openId 和用户信息
+   * 小程序端通过 wx.cloud.callFunction('login') 静默登录，云端基于 OPENID 创建/复用用户记录
    */
   async function login() {
     if (logging.value) return
@@ -64,26 +64,36 @@ export const useUserStore = defineStore('user', () => {
 
     try {
       // #ifdef MP-WEIXIN
-      const loginRes = await new Promise<UniApp.LoginRes>((resolve, reject) => {
-        uni.login({
-          provider: 'weixin',
-          success: resolve,
-          fail: reject,
+      const loginRes: any = await new Promise((resolve) => {
+        wx.cloud.callFunction({
+          name: 'login',
+          data: { action: 'login' },
+          success: (r: any) => resolve(r.result),
+          fail: (e: any) => resolve({ success: false, errMsg: e.errMsg || '云函数调用失败' }),
         })
       })
 
-      // TODO: 调用云函数 login 获取 openId
-      console.log('[UserStore] 微信登录 code:', loginRes.code)
-      // const result = await callCloud('login', { code: loginRes.code })
-      // setUser(result.user)
+      if (loginRes?.success && loginRes.data) {
+        const u = loginRes.data
+        setUser({
+          id: u.id,
+          openId: u.openId,
+          nickname: u.nickname || '星旅者',
+          avatarUrl: u.avatarUrl || '',
+          latestType: u.latestType,
+          membership: u.membership || { type: 'free', expireAt: 0, isActive: false },
+        } as User)
+        console.log('[UserStore] 登录成功:', u.openId)
+      } else {
+        console.warn('[UserStore] 云端登录返回失败:', loginRes)
+        // 保持本地状态（isLoggedIn 不动），不阻断用户主流程
+      }
       // #endif
 
       // #ifdef H5
-      // H5 端模拟登录
-      console.log('[UserStore] H5 端登录')
+      // H5 端：暂未接入后端登录，保持未登录态
+      console.log('[UserStore] H5 端登录暂未实现')
       // #endif
-
-      isLoggedIn.value = true
     } catch (e) {
       console.error('[UserStore] 登录失败:', e)
       isLoggedIn.value = false

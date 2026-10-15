@@ -4,6 +4,7 @@
  */
 import { ref } from 'vue'
 import { paymentService, PRODUCT_PRICES, PRODUCT_NAMES, formatPrice } from '@/services/payment.service'
+import { callCloud } from '@/services/cloud'
 import type { OrderResponse } from '@/services/payment.service'
 
 /** 支付产品选项 */
@@ -52,6 +53,23 @@ export function usePayment() {
   /** 已付费的产品类型 */
   const paidProductType = ref<string>('')
 
+  /** 是否为 iOS 平台（小程序端用于虚拟支付限制） */
+  const isIOS = ref(false)
+
+  /** 初始化平台检测（在 MP-WEIXIN 端调用 wx.getSystemInfoSync 一次） */
+  function detectPlatform() {
+    // #ifdef MP-WEIXIN
+    try {
+      /* @ts-ignore */
+      const info = wx.getSystemInfoSync()
+      isIOS.value = /ios/i.test(info?.platform || '')
+    } catch {
+      isIOS.value = false
+    }
+    // #endif
+  }
+  detectPlatform()
+
   /**
    * 创建订单并发起支付
    *
@@ -64,6 +82,13 @@ export function usePayment() {
     productType: 'basic' | 'advanced' | 'comparison'
   ): Promise<boolean> {
     if (isLoading.value) return false
+
+    // iOS 小程序虚拟支付限制（微信硬性要求）
+    if (isIOS.value) {
+      payError.value = '因平台政策，iOS 端暂不支持应用内购买，请使用安卓设备或 H5 端'
+      uni.showToast({ title: payError.value, icon: 'none', duration: 2800 })
+      return false
+    }
 
     isLoading.value = true
     payError.value = ''
@@ -121,6 +146,65 @@ export function usePayment() {
   }
 
   /**
+   * 使用已有的订单直接发起支付（跳过 createOrder 步骤）
+   * 适用于：compare.createPayOrder 等外部已经创建好订单并返回 payParams 的场景
+   *
+   * @param order - 云函数返回的 order 数据，至少包含 { orderId, payParams }
+   * @returns 是否支付成功
+   */
+  async function payWithOrder(order: OrderResponse): Promise<boolean> {
+    if (isLoading.value) return false
+    if (isIOS.value) {
+      payError.value = '因平台政策，iOS 端暂不支持应用内购买，请使用安卓设备或 H5 端'
+      uni.showToast({ title: payError.value, icon: 'none', duration: 2800 })
+      return false
+    }
+    isLoading.value = true
+    payError.value = ''
+    currentOrder.value = order
+
+    try {
+      const { payParams, orderId } = order
+
+      // #ifdef MP-WEIXIN
+      if (payParams && !payParams.devMode) {
+        const ok = await wxRequestPayment(payParams)
+        if (ok) {
+          handlePaySuccess(orderId)
+          return true
+        }
+        return false
+      }
+      // #endif
+
+      // #ifdef H5
+      if (payParams?.devMode) {
+        console.log('[Payment] H5 开发模式：模拟支付成功')
+        handlePaySuccess(orderId)
+        return true
+      }
+      payError.value = 'H5 端支付暂未开放，请在小程序端完成支付'
+      return false
+      // #endif
+
+      // 开发模式兜底：模拟成功
+      if (payParams?.devMode) {
+        console.log('[Payment] devMode 模拟支付成功')
+        handlePaySuccess(orderId)
+        return true
+      }
+
+      payError.value = '当前平台暂不支持支付'
+      return false
+    } catch (e: any) {
+      handlePayFail(e)
+      return false
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  /**
    * 检查是否已付费
    */
   async function checkPaymentStatus(resultId: string, productType?: string): Promise<boolean> {
@@ -146,9 +230,9 @@ export function usePayment() {
   }
 
   /**
-   * 支付成功处理
+   * 支付成功处理（含云端回查：防止 payCallback 延迟导致的掉单）
    */
-  function handlePaySuccess(orderId: string) {
+  async function handlePaySuccess(orderId: string) {
     isPaid.value = true
     payError.value = ''
 
@@ -157,7 +241,7 @@ export function usePayment() {
       paidProductType.value = currentOrder.value.productName || ''
     }
 
-    // 本地缓存支付状态
+    // 本地缓存支付状态（兜底，便于弱网/刷新场景快速恢复）
     try {
       const paidResults = JSON.parse(uni.getStorageSync('soulmap_paid_results') || '{}')
       if (currentOrder.value) {
@@ -165,6 +249,8 @@ export function usePayment() {
           orderId,
           paidAt: Date.now(),
           productType: currentOrder.value.productName,
+          productId: currentOrder.value.productId || '',
+          resultId: currentOrder.value.resultId || '',
         }
         uni.setStorageSync('soulmap_paid_results', JSON.stringify(paidResults))
       }
@@ -172,8 +258,34 @@ export function usePayment() {
       // 缓存失败不影响主流程
     }
 
+    // 云端回查：最多重试 3 次，间隔 1.5s，等待 payCallback 落库
+    // 仅作为防掉单双保险，不影响 UI 主流程
+    void verifyOrderAsync(orderId)
+
     uni.showToast({ title: '支付成功', icon: 'success' })
     console.log('[Payment] 支付成功:', orderId)
+  }
+
+  /** 异步回查订单状态，最多 3 次 */
+  async function verifyOrderAsync(orderId: string) {
+    const MAX = 3
+    const DELAY = 1500
+    for (let i = 0; i < MAX; i++) {
+      await new Promise((r) => setTimeout(r, DELAY))
+      try {
+        const res = await callCloud<{ status: string }>('createOrder', {
+          action: 'verifyOrder',
+          orderId,
+        })
+        if (res.success && res.data?.status === 'paid') {
+          console.log('[Payment] 云端确认订单已 paid:', orderId)
+          return
+        }
+      } catch (e) {
+        console.warn('[Payment] verifyOrder 失败:', e)
+      }
+    }
+    console.warn('[Payment] 云端回查未确认 paid，可能需要人工核对:', orderId)
   }
 
   /**
@@ -204,10 +316,12 @@ export function usePayment() {
   return {
     isLoading,
     isPaid,
+    isIOS,
     currentOrder,
     payError,
     paidProductType,
     payForReport,
+    payWithOrder,
     checkPaymentStatus,
     resetPayment,
     /** 产品定价常量 */
