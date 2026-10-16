@@ -228,7 +228,12 @@
 
         <view class="share-btn" @tap="handleShare">
           <text class="share-btn__icon">📤</text>
-          <text class="share-btn__text">分享给好友</text>
+          <!-- #ifdef MP-WEIXIN -->
+          <text class="share-btn__text">转发给好友</text>
+          <!-- #endif -->
+          <!-- #ifdef H5 -->
+          <text class="share-btn__text">复制邀请链接</text>
+          <!-- #endif -->
         </view>
         <text class="footer-note">
           {{ showPaywallSection ? '众多同类型星灵已解锁深度解读，你也可以' : '当前版本所有深度解读均可免费查看' }}
@@ -251,6 +256,30 @@
         />
       </view>
     </view>
+
+    <!-- H5 分享面板（复制链接 + 二维码） -->
+    <!-- #ifdef H5 -->
+    <view v-if="showSharePanel" class="share-panel-modal" @tap.self="handleCloseSharePanel">
+      <view class="share-panel-modal__content">
+        <view class="share-panel-modal__close" @tap="handleCloseSharePanel">
+          <text class="share-panel-modal__close-text">✕</text>
+        </view>
+        <text class="share-panel-modal__title">分享给好友</text>
+        <text class="share-panel-modal__desc">邀请链接已复制到剪贴板</text>
+        <view class="share-panel-modal__qr">
+          <image
+            :src="'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(h5ShareLink)"
+            mode="aspectFit"
+            class="share-panel-modal__qr-img"
+          />
+        </view>
+        <text class="share-panel-modal__link">{{ h5ShareLink }}</text>
+        <view class="share-panel-modal__btn" @tap="handleCopyAgain">
+          <text class="share-panel-modal__btn-text">再次复制链接</text>
+        </view>
+      </view>
+    </view>
+    <!-- #endif -->
 
     <!-- 无结果时的提示 -->
     <view v-if="!showReveal && !personalityData" class="no-result">
@@ -304,6 +333,15 @@ const showReveal = ref(true)
 
 /** 是否显示分享海报弹窗 */
 const showPoster = ref(false)
+
+/** H5 分享面板是否显示 */
+const showSharePanel = ref(false)
+
+/** H5 分享链接 */
+const h5ShareLink = computed(() => {
+  const share = invite.buildSharePayload(personalityData.value?.name || '你的星灵')
+  return share.h5Link
+})
 
 /** 揭晓动画持续时间(ms) */
 const REVEAL_DURATION = 2500
@@ -557,7 +595,38 @@ function handleShare() {
     shareType: 'result_bottom',
     resultType: testStore.result?.personalityType || '',
   })
-  showPoster.value = true
+  // #ifdef MP-WEIXIN
+  // 小程序端：提示用户点击右上角「...」转发
+  uni.showToast({
+    title: '点击右上角「...」转发给好友',
+    icon: 'none',
+    duration: 2500,
+  })
+  // #endif
+  // #ifdef H5
+  // H5 端：复制邀请链接到剪贴板，弹出分享面板
+  uni.setClipboardData({
+    data: h5ShareLink.value,
+    success: () => {
+      showSharePanel.value = true
+    },
+  })
+  // #endif
+}
+
+/** 关闭 H5 分享面板 */
+function handleCloseSharePanel() {
+  showSharePanel.value = false
+}
+
+/** H5 再次复制链接 */
+function handleCopyAgain() {
+  uni.setClipboardData({
+    data: h5ShareLink.value,
+    success: () => {
+      uni.showToast({ title: '链接已复制', icon: 'success', duration: 1500 })
+    },
+  })
 }
 
 /** 关闭分享海报 */
@@ -1266,6 +1335,105 @@ function goToAtlas() {
   &__close-text {
     font-size: 40rpx;
     color: rgba(255, 255, 255, 0.7);
+  }
+}
+
+/* ===== H5 分享面板 ===== */
+.share-panel-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.85);
+  animation: fadeIn 0.3s ease;
+
+  &__content {
+    position: relative;
+    width: 80%;
+    max-width: 580rpx;
+    background: linear-gradient(180deg, #1a0533, #0d0118);
+    border-radius: $radius-xl;
+    padding: $spacing-xxl $spacing-xl;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $spacing-md;
+  }
+
+  &__close {
+    position: absolute;
+    top: -60rpx;
+    right: 0;
+    width: 56rpx;
+    height: 56rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+  }
+
+  &__close-text {
+    font-size: 40rpx;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  &__title {
+    font-size: $font-lg;
+    font-weight: 700;
+    color: $accent-gold;
+    letter-spacing: 4rpx;
+  }
+
+  &__desc {
+    font-size: $font-sm;
+    color: $text-muted;
+  }
+
+  &__qr {
+    width: 320rpx;
+    height: 320rpx;
+    border-radius: $radius-lg;
+    background: #fff;
+    padding: $spacing-sm;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__qr-img {
+    width: 280rpx;
+    height: 280rpx;
+  }
+
+  &__link {
+    font-size: $font-xs;
+    color: $text-muted;
+    text-align: center;
+    word-break: break-all;
+    line-height: 1.6;
+    max-width: 100%;
+    padding: 0 $spacing-sm;
+  }
+
+  &__btn {
+    padding: $spacing-sm $spacing-xl;
+    border-radius: $radius-full;
+    background: rgba(108, 60, 224, 0.2);
+    border: 1rpx solid rgba(108, 60, 224, 0.4);
+    transition: all 0.2s ease;
+
+    &:active {
+      background: rgba(108, 60, 224, 0.35);
+      transform: scale(0.97);
+    }
+  }
+
+  &__btn-text {
+    font-size: $font-base;
+    color: $text-secondary;
+    letter-spacing: 2rpx;
   }
 }
 </style>

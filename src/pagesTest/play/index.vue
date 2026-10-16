@@ -24,20 +24,23 @@
       ></view>
     </view>
 
-    <!-- 状态栏占位（自定义导航栏） -->
-    <view class="status-bar" :style="{ height: statusBarHeight + 'px' }"></view>
-
-    <!-- 顶部：闯关地图进度条 + 星图指示器 -->
-    <view class="top-section">
-      <ProgressMap
-        :current-chapter="engine.currentChapter.value"
-        :current-question-in-chapter="questionNumberInChapter"
-        :total-chapters="6"
-      />
+    <!-- 状态栏与微信胶囊各自避让；进度地图放在完整导航行下方。 -->
+    <view class="status-bar" :style="{ height: statusBarHeight + 'px' }" />
+    <view class="page-nav" :style="{ height: navigationHeight + 'px', paddingRight: navigationRightInset + 'px' }">
+      <button class="nav-back" aria-label="返回" @tap="handleBack">‹</button>
+      <text class="nav-title">灵魂探索</text>
       <view class="star-map-wrapper">
-        <StarMapIndicator
-          :scores="engine.guideScoring.rawGuideScores.value"
-          compact
+        <StarMapIndicator :scores="engine.guideScoring.rawGuideScores.value" compact />
+      </view>
+    </view>
+
+    <view class="top-section">
+      <view class="progress-map-slot">
+        <ProgressMap
+          :current-chapter="engine.currentChapterOrder.value"
+          :chapter-progress="engine.chapterProgress.value"
+          :total-chapters="engine.chaptersList.value.length"
+          :chapter-names="chapterNames"
         />
       </view>
     </view>
@@ -49,8 +52,20 @@
       :scroll-into-view="scrollTarget"
       :show-scrollbar="false"
     >
+      <view v-if="initializationError" class="state-message">
+        <text>{{ initializationError }}</text>
+        <button class="state-button" @tap="restartFromError">重新开始探索</button>
+      </view>
+      <view v-else-if="completionError" class="state-message">
+        <text>{{ completionError }}</text>
+        <button class="state-button" @tap="retryCompletion">重试保存结果</button>
+      </view>
+      <view v-else-if="engine.isCompleted.value" class="state-message">
+        <text>探索已完成，正在保存结果…</text>
+      </view>
+
       <!-- 章节信息头 -->
-      <view class="chapter-header" :key="'ch-' + engine.currentChapter.value">
+      <view v-if="currentQuestion" class="chapter-header" :key="'ch-' + engine.currentChapter.value">
         <text class="chapter-badge">{{ currentChapterSubtitle }}</text>
         <text class="chapter-divider">·</text>
         <text class="chapter-count">{{ engine.questionNumberInChapter.value }} / {{ currentChapterTotal }}</text>
@@ -145,12 +160,19 @@
       :visible="engine.showMiniTheater.value"
       @complete="handleMiniTheaterComplete"
     />
+
+    <!-- 穿插小游戏 -->
+    <MiniGameOverlay
+      :visible="showMiniGame"
+      @complete="handleMiniGameComplete"
+      @skip="handleMiniGameSkip"
+    />
   </view>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
-import { onLoad } from '@dcloudio/uni-app'
+import { onLoad, onShow, onHide, onUnload, onResize } from '@dcloudio/uni-app'
 import { useTestEngine } from '@/composables/useTestEngine'
 import { useTestStore } from '@/stores/test'
 import { chapterMeta } from '@/data/chapters'
@@ -164,19 +186,36 @@ import GuideDialogue from '@/components/test/GuideDialogue.vue'
 import SoulResonance from '@/components/test/SoulResonance.vue'
 import StarMapIndicator from '@/components/test/StarMapIndicator.vue'
 import GuideMiniTheater from '@/components/test/GuideMiniTheater.vue'
+import MiniGameOverlay from '@/components/test/MiniGameOverlay.vue'
+import { useMiniGame } from '@/composables/useMiniGame'
 
 /* ===== 引擎初始化 ===== */
 const engine = useTestEngine()
 const testStore = useTestStore()
+const miniGame = useMiniGame()
+const showMiniGame = ref(false)
 
-/** 状态栏高度 */
+/** 自定义导航安全区，微信胶囊使用 px 测量，不能只避让状态栏。 */
 const statusBarHeight = ref(0)
+const navigationHeight = ref(44)
+const navigationRightInset = ref(16)
+const initialized = ref(false)
+const initializationError = ref('')
+const chapterNames = computed(() => engine.chaptersList.value.map(chapter => chapter.name))
 
-/** 当前题目 */
-const currentQuestion = computed(() => engine.currentQuestion.value)
+let pageActive = true
+let disposed = false
+let resultSaved = false
+let finishing = false
+let optionsTimer: ReturnType<typeof setTimeout> | null = null
+let answerTimer: ReturnType<typeof setTimeout> | null = null
+let resultTimer: ReturnType<typeof setTimeout> | null = null
+let pendingAnswer: { questionId: string; optionIndex: number } | null = null
 
-/** 当前章节内题号 (1-based) */
-const questionNumberInChapter = computed(() => engine.questionNumberInChapter.value)
+/** 不展示尚未初始化或已完成存档中的最后一题。 */
+const currentQuestion = computed(() =>
+  initialized.value && !engine.isCompleted.value ? engine.currentQuestion.value : null,
+)
 
 /** 选中的选项索引 */
 const selectedOptionIndex = ref(-1)
@@ -217,23 +256,78 @@ const currentChapterSubtitle = computed(() => {
 
 /* ===== 生命周期 ===== */
 
-onLoad(() => {
-  // 获取状态栏高度
-  const sysInfo = uni.getSystemInfoSync()
-  statusBarHeight.value = sysInfo.statusBarHeight ?? 0
+function updateNavigationMetrics(): void {
+  const info = uni.getSystemInfoSync()
+  statusBarHeight.value = info.statusBarHeight ?? 0
+  navigationHeight.value = 44
+  navigationRightInset.value = 16
+  // #ifdef MP-WEIXIN
+  navigationRightInset.value = 108
+  try {
+    const capsule = wx.getMenuButtonBoundingClientRect()
+    if (capsule.width > 0 && capsule.height > 0 && capsule.top >= statusBarHeight.value) {
+      const gap = capsule.top - statusBarHeight.value
+      navigationHeight.value = Math.max(44, capsule.height + gap * 2)
+      navigationRightInset.value = Math.max(16, info.windowWidth - capsule.left + 12)
+    }
+  } catch (error) {
+    console.warn('[Play] 胶囊尺寸读取失败，使用安全区兜底', error)
+  }
+  // #endif
+}
 
-  // 尝试恢复进度，若无则开始新测试
-  if (!engine.hasSavedProgress()) {
-    engine.startTest()
+onLoad((query) => {
+  updateNavigationMetrics()
+  const saved = engine.inspectSavedProgress()
+  if (query?.resume === 'fresh' || (saved.status === 'none' && query?.resume !== 'continue')) {
+    initialized.value = engine.startTest()
+    if (!initialized.value) initializationError.value = '无法保存新的答题进度，请检查本机存储后重试。'
+  } else if (saved.status === 'unfinished' || (saved.status === 'completed' && saved.version === 2)) {
+    initialized.value = engine.loadProgress()
+    if (!initialized.value) initializationError.value = '进度恢复失败，请重新开始探索。'
+  } else if (saved.status === 'completed') {
+    // 兼容旧版 36 题已答完的残留存档：不能当作最后一题继续，也不重复创建结果。
+    testStore.hydrateResultFromStorage()
+    if (testStore.result) {
+      uni.redirectTo({ url: '/pagesTest/result/index' })
+    } else {
+      initializationError.value = '上次探索已结束，旧版存档不能继续答题。请重新开始。'
+    }
   } else {
-    engine.loadProgress()
+    initializationError.value = saved.status === 'none'
+      ? '没有可继续的探索，请重新开始。'
+      : '上次进度数据异常，已保留原记录。请重新开始探索。'
   }
 })
 
-onMounted(() => {
-  // 选项延迟显示（等待叙事文字开始打字后）
-  scheduleShowOptions()
+onMounted(() => { scheduleShowOptions() })
+onResize(() => { updateNavigationMetrics() })
+onShow(() => {
+  pageActive = true
+  if (resultSaved) scheduleResultNavigation()
+  else if (engine.isCompleted.value) finishTest()
+  else scheduleShowOptions()
 })
+
+function suspendPage(): void {
+  pageActive = false
+  settlePendingAnswer()
+  if (initialized.value && !resultSaved) engine.saveProgress()
+  cancelTimers()
+}
+
+onHide(() => { suspendPage() })
+onUnload(() => {
+  suspendPage()
+  disposed = true
+})
+
+function cancelTimers(): void {
+  if (optionsTimer) clearTimeout(optionsTimer)
+  if (answerTimer) clearTimeout(answerTimer)
+  if (resultTimer) clearTimeout(resultTimer)
+  optionsTimer = answerTimer = resultTimer = null
+}
 
 /** 监听题目变化，重置状态 */
 watch(
@@ -264,10 +358,9 @@ watch(
   () => engine.isChapterTransition.value,
   (val) => {
     if (val) {
-      // 刚完成的章节是 currentChapter - 1
-      const finishedChapter = engine.currentChapter.value - 1
-      transitionChapter.value = finishedChapter
-      const chId = `ch${finishedChapter}`
+      // 身份使用 chapterId，显示编号使用配置 order；ch6 实际是第四章。
+      const chId = engine.transitionFromChapterId.value || ''
+      transitionChapter.value = engine.chaptersList.value.find(chapter => chapter.id === chId)?.order ?? 1
       transitionFragmentName.value = chapterMeta[chId]?.fragmentName ?? '灵魂碎片'
       showTransition.value = true
       isTransitioning.value = true
@@ -275,93 +368,141 @@ watch(
   },
 )
 
-/** 监听测试完成 */
-watch(
-  () => engine.isCompleted.value,
-  (val) => {
-    if (val) {
-      // 计算结果（含向导系统）
-      const engineResult = engine.getResult()
-      const pct = engineResult.percentages || { EI: 50, SN: 50, TF: 50, JP: 50 }
-      const dims = engineResult.scores || { EI: 50, SN: 50, TF: 50, JP: 50 }
+/** 完成检查点和结果使用相同 resultId；重试或重新进入不重复创建历史。 */
+const completionError = ref('')
+watch(() => engine.isCompleted.value, (completed) => {
+  if (completed) finishTest()
+})
 
-      // 转换为 TestResult 标准结构（结果页与详情页均依赖此格式）
-      const testResult = {
-        resultId: `result_${Date.now()}`,
-        sessionId: '',
-        userId: '',
-        personalityType: engineResult.type as any,
-        dimensionScores: dims,
-        confidence: {
-          EI: (pct.EI ?? 50) / 100,
-          SN: (pct.SN ?? 50) / 100,
-          TF: (pct.TF ?? 50) / 100,
-          JP: (pct.JP ?? 50) / 100,
-        },
-        completedAt: Date.now(),
-        duration: engineResult.duration ?? 0,
-        reportUnlocked: false,
-      }
-
-      // 提取向导系统结果
-      const guideResult = engineResult.guideResult
-      const guideScores = guideResult?.rawScores ?? undefined
-      const guideCombo = guideResult?.combination ?? undefined
-
-      // 提取旅程故事
-      const journey = engineResult.journeyStory ?? undefined
-
-      // 写入 Pinia store（结果页会从这里读）
-      testStore.setResult(testResult, guideScores, guideCombo, journey)
-
-      // 清除答题进度存档：避免下次进入测试时 loadProgress 把 currentQuestionIndex
-      // 恢复到 35（最后一题），表现为"重新进入直接跳到最后一章"。
-      // 注意：结果本身已通过 SOULMAP_TEST_RESULT 持久化，不会丢失。
-      engine.clearSavedProgress()
-
-      // 延迟跳转结果页
-      setTimeout(() => {
-        uni.redirectTo({
-          url: '/pagesTest/result/index',
-        })
-      }, 800)
+function finishTest(): void {
+  if (disposed || finishing || resultSaved || !engine.isCompleted.value) return
+  finishing = true
+  try {
+    const result = engine.getResult()
+    const pct = result.percentages
+    const saved = testStore.setResult({
+      resultId: result.resultId,
+      sessionId: result.testId,
+      userId: '',
+      personalityType: result.type as any,
+      dimensionScores: result.scores,
+      confidence: { EI: pct.EI / 100, SN: pct.SN / 100, TF: pct.TF / 100, JP: pct.JP / 100 },
+      completedAt: Date.parse(result.completedAt),
+      duration: result.duration,
+      reportUnlocked: false,
+    }, result.guideResult.rawScores, result.guideResult.combination, result.journeyStory)
+    if (!saved) {
+      completionError.value = '结果保存失败，答题记录已保留。请重试保存。'
+      return
     }
-  },
-)
+    resultSaved = true
+    completionError.value = ''
+    engine.acknowledgeCompletion()
+    scheduleResultNavigation()
+  } catch (error) {
+    console.error('[Play] 保存结果失败', error)
+    completionError.value = '结果保存失败，答题记录已保留。请重试保存。'
+  } finally {
+    finishing = false
+  }
+}
+
+function scheduleResultNavigation(): void {
+  if (!pageActive || disposed || resultTimer) return
+  resultTimer = setTimeout(() => {
+    resultTimer = null
+    if (pageActive && !disposed) uni.redirectTo({ url: '/pagesTest/result/index' })
+  }, 800)
+}
 
 /* ===== 方法 ===== */
 
-/** 延迟显示选项按钮 */
+/** 页面退出后，旧定时器不能显示新题选项或覆盖新测试。 */
 function scheduleShowOptions(): void {
-  const narrative = currentQuestion.value?.text ?? ''
-  // 打字机完成大约需要 narrative.length * 30ms，选项提前一些显示
-  const delay = Math.min(narrative.length * 20, 2000)
-  setTimeout(() => {
-    showOptions.value = true
+  if (optionsTimer) clearTimeout(optionsTimer)
+  if (!pageActive || disposed || !currentQuestion.value || engine.isDialogueActive.value || engine.isChapterTransition.value) return
+  const questionId = currentQuestion.value.id
+  const delay = Math.min(currentQuestion.value.text.length * 20, 2000)
+  optionsTimer = setTimeout(() => {
+    optionsTimer = null
+    if (!disposed && pageActive && currentQuestion.value?.id === questionId) showOptions.value = true
   }, delay)
 }
 
-/** 处理选项选择 */
 function handleOptionSelect(index: number): void {
-  if (isTransitioning.value) return
-
+  if (isTransitioning.value || !currentQuestion.value || engine.isDialogueActive.value || engine.isCompleted.value) return
   selectedOptionIndex.value = index
   isTransitioning.value = true
+  pendingAnswer = { questionId: currentQuestion.value.id, optionIndex: index }
+  answerTimer = setTimeout(settlePendingAnswer, 500)
+}
 
-  // 短暂延迟后记录答案并前进
-  setTimeout(() => {
-    engine.selectOption(index)
-  }, 500)
+/** 切后台/退出时也结算用户已经选中的答案，避免 500ms 动画窗口丢题。 */
+function settlePendingAnswer(): void {
+  if (answerTimer) clearTimeout(answerTimer)
+  answerTimer = null
+  const pending = pendingAnswer
+  pendingAnswer = null
+  if (!pending || disposed || engine.currentQuestion.value?.id !== pending.questionId) return
+  engine.selectOption(pending.optionIndex)
+  if (engine.progress.value === 100 && !engine.isCompleted.value) {
+    completionError.value = '答题完成，进度保存失败。请重试保存。'
+  }
+}
+
+function retryCompletion(): void {
+  if (!engine.isCompleted.value && !engine.saveProgress()) return
+  finishTest()
+}
+
+function restartFromError(): void {
+  uni.redirectTo({ url: '/pagesTest/intro/index' })
+}
+
+function handleBack(): void {
+  if (getCurrentPages().length > 1) uni.navigateBack()
+  else uni.reLaunch({ url: '/pages/index/index' })
 }
 
 /** 过场动画关闭 */
 function handleTransitionClose(): void {
   showTransition.value = false
   isTransitioning.value = false
+
+  // 在 ch3→ch4、ch4→ch5 过渡时触发穿插小游戏
+  const fromChId = engine.transitionFromChapterId.value || ''
+  if ((fromChId === 'ch3' || fromChId === 'ch4') && !showMiniGame.value) {
+    const triggered = miniGame.triggerMiniGame(fromChId)
+    if (triggered) {
+      showMiniGame.value = true
+      engine.confirmChapterTransition()
+      return // 等小游戏结束后再推进题目
+    }
+  }
+
   engine.confirmChapterTransition()
 
   // 过场结束后重置状态，显示新题目的选项
   selectedOptionIndex.value = -1
+  showOptions.value = false
+  scheduleShowOptions()
+}
+
+/** 穿插小游戏完成 */
+function handleMiniGameComplete(): void {
+  showMiniGame.value = false
+  // 小游戏结束后推进到下一题
+  selectedOptionIndex.value = -1
+  isTransitioning.value = false
+  showOptions.value = false
+  scheduleShowOptions()
+}
+
+/** 穿插小游戏跳过 */
+function handleMiniGameSkip(): void {
+  showMiniGame.value = false
+  selectedOptionIndex.value = -1
+  isTransitioning.value = false
   showOptions.value = false
   scheduleShowOptions()
 }
@@ -373,12 +514,24 @@ function handleOverlayComplete(): void {
 
 /** 向导对话选择 */
 function handleDialogueSelect(payload: { optionIndex: number }): void {
+  if (disposed || !engine.isDialogueActive.value) return
   engine.handleDialogueSelect(payload.optionIndex)
+  // 正常答题会移动游标，恢复对话时可能保持原游标；两种路径都显式恢复选项。
+  if (!engine.isDialogueActive.value && !engine.isChapterTransition.value && !engine.isCompleted.value) {
+    selectedOptionIndex.value = -1
+    isTransitioning.value = false
+    showOptions.value = false
+    scheduleShowOptions()
+  }
 }
 
-/** 向导对话动画完成 */
+/** 恢复时游标已指向下一未答题，关闭对话后不一定触发题号 watcher。 */
 function handleDialogueComplete(): void {
-  // 对话组件自行完成动画后，引擎已在 handleDialogueSelect 中处理了前进逻辑
+  if (disposed || engine.isCompleted.value || engine.isDialogueActive.value) return
+  selectedOptionIndex.value = -1
+  isTransitioning.value = false
+  showOptions.value = false
+  scheduleShowOptions()
 }
 
 /** 灵魂共鸣动画完成 */
@@ -395,6 +548,7 @@ function handleMiniTheaterComplete(): void {
 <style lang="scss" scoped>
 .page-play {
   position: relative;
+  height: 100vh;
   min-height: 100vh;
   background: #0a0a0f;
   display: flex;
@@ -453,20 +607,60 @@ function handleMiniTheaterComplete(): void {
   z-index: 10;
 }
 
-/* ===== 顶部进度条 ===== */
-.top-section {
+.page-nav {
   position: relative;
   z-index: 10;
   flex-shrink: 0;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  padding-left: 12px;
+  box-sizing: border-box;
+  gap: 8px;
+}
+.nav-back {
+  width: 32px;
+  height: 36px;
+  line-height: 32px;
+  padding: 0;
+  margin: 0;
+  flex-shrink: 0;
+  background: transparent;
+  border: none;
+  color: #e8d5a3;
+  font-size: 32px;
+  &::after { border: none; }
+}
+.nav-title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #e8d5a3;
+}
+.star-map-wrapper { flex-shrink: 0; }
+
+/* 完成进度占据独立整行，微信胶囊与星图不再压缩地图宽度。 */
+.top-section {
+  position: relative;
+  z-index: 10;
+  flex-shrink: 0;
   padding: 0 16rpx;
 }
-
-.star-map-wrapper {
-  flex-shrink: 0;
-  margin-left: 16rpx;
+.progress-map-slot { width: 100%; min-width: 0; }
+.state-message {
+  padding: 48rpx 16rpx;
+  color: #e8d5a3;
+  text-align: center;
+  line-height: 1.8;
+}
+.state-button {
+  margin-top: 24rpx;
+  font-size: 28rpx;
+  color: #1a1008;
+  background: #c9a96e;
 }
 
 /* ===== 主内容区 ===== */
@@ -487,7 +681,8 @@ function handleMiniTheaterComplete(): void {
   align-items: center;
   justify-content: center;
   gap: 16rpx;
-  padding: 24rpx 0 16rpx;
+  flex-wrap: wrap;
+  padding: 16rpx 0;
   animation: fadeIn 0.6s ease forwards;
 }
 
@@ -519,33 +714,20 @@ function handleMiniTheaterComplete(): void {
   padding: 8rpx 0;
 }
 
-/* 底部安全区 */
-.bottom-safe {
-  height: 160rpx;
-}
-
-/* ===== 底部信息栏 ===== */
+/* 底栏占据独立 flex 行，内容无需猜测固定遮挡高度。 */
+.bottom-safe { height: 32rpx; }
 .bottom-bar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  position: relative;
+  flex-shrink: 0;
   z-index: 20;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  padding: 20rpx 40rpx;
+  gap: 12rpx 24rpx;
+  padding: 20rpx 24rpx;
   padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
-  background: linear-gradient(180deg, transparent 0%, rgba(10, 10, 15, 0.95) 40%);
-  backdrop-filter: blur(12rpx);
-  /* #ifdef H5 */
-  @media screen and (min-width: 768px) {
-    max-width: 480px;
-    left: 50%;
-    right: auto;
-    transform: translateX(-50%);
-  }
-  /* #endif */
+  background: rgba(10, 10, 15, 0.95);
 }
 
 .progress-hint {

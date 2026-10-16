@@ -54,13 +54,12 @@ const tintedTextColor = computed(() => {
 
 <style lang="scss" scoped>
 .guide-reaction {
-  position: fixed;
-  top: 180rpx;
-  left: 0;
-  right: 0;
-  z-index: 800;
+  position: relative;
+  width: 100%;
   display: flex;
   justify-content: center;
+  padding: 8rpx 0 16rpx;
+  box-sizing: border-box;
   pointer-events: none;
   animation: reactionLifecycle 2.1s ease forwards;
 }
@@ -68,6 +67,8 @@ const tintedTextColor = computed(() => {
 /* === 胶囊气泡 === */
 .reaction-pill {
   display: inline-flex;
+  max-width: 100%;
+  box-sizing: border-box;
   align-items: center;
   gap: 12rpx;
   padding: 14rpx 28rpx;
@@ -92,7 +93,9 @@ const tintedTextColor = computed(() => {
   line-height: 1.4;
   letter-spacing: 1rpx;
   font-family: "STKaiti", "KaiTi", "楷体", serif;
-  white-space: nowrap;
+  min-width: 0;
+  white-space: normal;
+  word-break: break-all;
 }
 
 /* === 生命周期动画：滑入 → 停留 → 滑出 === */

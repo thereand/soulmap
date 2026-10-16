@@ -67,10 +67,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue'
+import { ref, watch, computed, onUnmounted } from 'vue'
+import { chapters } from '@/data/chapters'
 
 interface Props {
-  /** 章节编号 (1~5) */
+  /** 章节显示顺序 (1~6)，不是章节 ID 后缀。 */
   chapterNumber: number
   /** 碎片名称 */
   fragmentName: string
@@ -93,52 +94,37 @@ const showContent = ref(false)
 const showTitle = ref(false)
 const showFragment = ref(false)
 
-/** 碎片对应的 emoji（按章节 ID 编号查找） */
+/** 章节身份和显示顺序分离，第四个显示节点是 ch6 试炼。 */
+const displayedChapter = computed(() => chapters.find(chapter => chapter.order === props.chapterNumber))
 const fragmentEmoji = computed(() => {
-  const emojis: Record<number, string> = {
-    1: '✦', 2: '◈', 3: '❋', 4: '⚡', 5: '☯', 6: '⟡',
+  const icons: Record<string, string> = {
+    ch1: '✦', ch2: '◈', ch3: '❋', ch4: '⚡', ch5: '☯', ch6: '⟡',
   }
-  return emojis[props.chapterNumber] ?? '✦'
+  return icons[displayedChapter.value?.id || ''] ?? '✦'
 })
+const chapterSubtitle = computed(() => displayedChapter.value?.name ?? '')
 
-/** 章节副标题（按章节 ID 编号查） */
-const chapterSubtitle = computed(() => {
-  const subtitles: Record<number, string> = {
-    1: '觉醒', 2: '探索', 3: '抉择', 4: '蜕变', 5: '归宿', 6: '试炼',
-  }
-  return subtitles[props.chapterNumber] ?? ''
-})
+let timers: ReturnType<typeof setTimeout>[] = []
+function clearTimers(): void {
+  timers.forEach(timer => clearTimeout(timer))
+  timers = []
+}
 
-/** 关闭定时器 */
-let closeTimer: ReturnType<typeof setTimeout> | null = null
-
-/** 分阶段显示动画 */
-watch(() => props.visible, (val) => {
-  if (val) {
-    showContent.value = false
-    showTitle.value = false
-    showFragment.value = false
-
-    // 阶段1：标题出现
-    setTimeout(() => { showContent.value = true }, 200)
-    // 阶段2：章节名
-    setTimeout(() => { showTitle.value = true }, 600)
-    // 阶段3：碎片出现
-    setTimeout(() => { showFragment.value = true }, 1100)
-    // 自动关闭
-    closeTimer = setTimeout(() => {
-      emit('close')
-    }, 3000)
-  } else {
-    showContent.value = false
-    showTitle.value = false
-    showFragment.value = false
-    if (closeTimer) {
-      clearTimeout(closeTimer)
-      closeTimer = null
-    }
+watch(() => props.visible, (visible) => {
+  clearTimers()
+  showContent.value = false
+  showTitle.value = false
+  showFragment.value = false
+  if (visible) {
+    timers = [
+      setTimeout(() => { showContent.value = true }, 200),
+      setTimeout(() => { showTitle.value = true }, 600),
+      setTimeout(() => { showFragment.value = true }, 1100),
+      setTimeout(() => { emit('close') }, 3000),
+    ]
   }
 })
+onUnmounted(clearTimers)
 </script>
 
 <style lang="scss" scoped>

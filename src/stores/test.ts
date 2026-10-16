@@ -290,7 +290,8 @@ export const useTestStore = defineStore('test', () => {
     guideScores?: GuideAffinityScores,
     guideCombo?: GuideCombination,
     journey?: string,
-  ): void {
+  ): boolean {
+    let persisted = true
     result.value = res
     if (guideScores) guideAffinityScores.value = guideScores
     if (guideCombo) guideCombination.value = guideCombo
@@ -307,6 +308,7 @@ export const useTestStore = defineStore('test', () => {
     try {
       uni.setStorageSync('SOULMAP_TEST_RESULT', JSON.stringify(storeData))
     } catch (e) {
+      persisted = false
       console.error('[TestStore] 保存结果失败:', e)
     }
 
@@ -329,8 +331,10 @@ export const useTestStore = defineStore('test', () => {
       const next = [record, ...filtered].slice(0, 50)
       uni.setStorageSync('SOULMAP_TEST_HISTORY', JSON.stringify(next))
     } catch (e) {
+      persisted = false
       console.warn('[TestStore] 追加历史记录失败:', e)
     }
+    return persisted
   }
 
   /**

@@ -15,7 +15,7 @@ export const soulmapTrialQuestions: TestQuestion[] = [
     chapterId: 'ch6',
     order: 1,
     type: 'single',
-    text: '脚下的地面突然开始崩裂，碎石坠入无底深渊。你只有十秒钟的时间选择逃生方向——眼前出现三条路：一条被耀眼的星光照亮，通往未知的高处；一条布满裂纹但看起来结构稳固的石板路；身后传来其他旅人的呼喊声，他们似乎也在寻找出路。倒计时已经开始。',
+    text: '脚下地面突然崩裂，碎石坠入无底深渊。你只有十秒钟选择逃生方向——眼前出现三条路：一条被耀眼光星照亮，通往未知高处；一条布满裂纹但结构稳固的石板路；身后传来其他旅人的呼喊声，他们也在寻找出路。倒计时已经开始。',
     image: 'chapter6_bg',
     estimatedTime: 25,
     options: [
@@ -45,7 +45,7 @@ export const soulmapTrialQuestions: TestQuestion[] = [
     chapterId: 'ch6',
     order: 2,
     type: 'single',
-    text: '裂缝尽头是一座镜之大殿。你走进去，面前浮现出一个与你一模一样的镜像——但它拥有你所有"未曾做到的可能性"。它比你更果断、更强大、更无所畏惧。镜像开口说："我是你放弃成为的那个人。你想如何面对我？"',
+    text: '裂缝尽头是一座镜之大殿。面前浮现出与你一模一样的镜像——但它拥有你所有"未曾做到的可能性"，比你更果断、更强大。镜像开口说："我是你放弃成为的那个人。你想如何面对我？"',
     image: 'chapter6_bg',
     estimatedTime: 25,
     options: [
@@ -75,7 +75,7 @@ export const soulmapTrialQuestions: TestQuestion[] = [
     chapterId: 'ch6',
     order: 3,
     type: 'single',
-    text: '镜之大殿深处，一架黄金天平悬浮在空中。审判者的声音再度响起："将你最珍贵的一段记忆放上天平，它将被永远封存为灵魂星图的基石。"你闭上眼，脑海中浮现出三段画面——你需要选择其中一段作为你最珍贵的记忆。',
+    text: '镜之大殿深处，一架黄金天平悬浮空中。审判者的声音再度响起："将你最珍贵的记忆放上天平，它将被永远封存为灵魂星图的基石。"你闭上眼，脑海中浮现三段画面——你需要选择其中一段。',
     image: 'chapter6_bg',
     estimatedTime: 25,
     options: [
@@ -105,7 +105,7 @@ export const soulmapTrialQuestions: TestQuestion[] = [
     chapterId: 'ch6',
     order: 4,
     type: 'single',
-    text: '天平消散后，你来到一座横跨深渊的古老石桥。桥面正在一块块碎裂坠落，而对岸传来微弱的求救声——有人被困在那里。桥看起来撑不了多久，但你注意到桥墩上刻着古老的工程符文，也许能解读出桥的结构弱点；远处似乎还有一条隐蔽的侧路通向对岸。',
+    text: '天平消散后，你来到一座横跨深渊的古老石桥。桥面正在一块块碎裂坠落，对岸传来微弱求救声。桥墩上刻着古老工程符文，也许能解读出结构弱点；远处似乎还有一条隐蔽侧路通向对岸。',
     image: 'chapter6_bg',
     estimatedTime: 25,
     options: [
@@ -135,7 +135,7 @@ export const soulmapTrialQuestions: TestQuestion[] = [
     chapterId: 'ch6',
     order: 5,
     type: 'single',
-    text: '桥的另一端坐着一位白发苍苍的老者，他也是试炼者——但已经在这片秘境中徘徊了几十年。他看着你说："年轻人，我见过无数旅人通过这里。有人为了胜利，有人为了真相，有人为了同伴，也有人只是享受这段路。在你继续之前，告诉我——对你而言，这场试炼最重要的是什么？"',
+    text: '桥另一端坐着一位白发老者，他也是试炼者——但已在这片秘境徘徊了几十年。他看着你说："年轻人，我见过无数旅人通过这里。有人为胜利，有人为真相，有人为同伴，也有人享受这段路。对你而言，这场试炼最重要的是什么？"',
     image: 'chapter6_bg',
     estimatedTime: 25,
     options: [
@@ -171,7 +171,7 @@ export const soulmapTrialQuestions: TestQuestion[] = [
     chapterId: 'ch6',
     order: 6,
     type: 'single',
-    text: '老者微微一笑，从怀中取出两把钥匙放在你面前。一把是温润的琥珀色，上面刻着你来时路上的地图——它能打开通往来时的路，让你带着所有收获回到熟悉的世界。另一把是深邃的星空色，表面流动着未知的光——它能打开一扇从未有人走过的门。老者说："选吧，旅人。"',
+    text: '老者微微一笑，取出两把钥匙。一把琥珀色，刻着来时地图——它能打开通往来时的路，带你回到熟悉的世界。另一把星空色，表面流动着未知的光——它能打开一扇从未有人走过的门。"选吧，旅人。"',
     image: 'chapter6_bg',
     estimatedTime: 25,
     options: [

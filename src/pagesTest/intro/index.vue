@@ -47,14 +47,15 @@
 
       <!-- 开启旅程按钮 -->
       <view class="action-section">
-        <!-- 继续上次进度（仅在检测到未完成存档时显示） -->
+        <text v-if="progressMessage" class="guide-desc">{{ progressMessage }}</text>
+        <!-- 有效未完成档可续答；新版完成档仅恢复结果保存。 -->
         <view
-          v-if="hasUnfinishedProgress"
+          v-if="hasUnfinishedProgress || canRecoverResult"
           class="action-btn action-btn--ghost"
           @tap="handleContinueJourney"
         >
           <view class="action-btn__inner">
-            <text class="action-btn__text">继续上次探索</text>
+            <text class="action-btn__text">{{ canRecoverResult ? '恢复上次结果' : '继续上次探索' }}</text>
             <text class="action-btn__arrow">→</text>
           </view>
         </view>
@@ -78,7 +79,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { onLoad } from '@dcloudio/uni-app'
+import { onLoad, onShow } from '@dcloudio/uni-app'
 import { useTestStore } from '@/stores/test'
 import { useTestEngine } from '@/composables/useTestEngine'
 import { zodiacMap } from '@/data/zodiac'
@@ -94,8 +95,11 @@ const phase = ref<Phase>('prologue')
 const showZodiac = ref(false)
 const showReady = ref(false)
 const selectedZodiacName = ref('')
-/** 是否有未完成的答题进度（用于显示"继续上次探索"按钮） */
+/** 仅有效未完成存档可续答，旧完成存档不会显示继续按钮。 */
 const hasUnfinishedProgress = ref(false)
+const canRecoverResult = ref(false)
+const progressMessage = ref('')
+let navigating = false
 
 /** 上次测试结果（用于重测体验） */
 const previousResult = ref<{
@@ -126,15 +130,39 @@ function checkPreviousResult() {
   }
 }
 
+function refreshProgressState(): void {
+  const saved = engine.inspectSavedProgress()
+  hasUnfinishedProgress.value = saved.status === 'unfinished'
+  canRecoverResult.value = saved.status === 'completed' && saved.version === 2
+  progressMessage.value = saved.status === 'unfinished'
+    ? `上次已完成 ${saved.answeredCount} / ${saved.totalQuestions} 题，可以继续或重新开始。`
+    : saved.status === 'completed'
+      ? '上次探索已完成，不再恢复最后一题。'
+      : saved.status === 'invalid'
+        ? '上次进度数据异常，已保留原记录，请确认后重新开始。'
+        : ''
+  if (saved.status !== 'none' && phase.value === 'prologue') {
+    phase.value = 'ready'
+    showReady.value = true
+  }
+}
+
 onLoad(() => {
-  console.log('[Page] 灵魂启程页加载')
+  refreshProgressState()
+})
+onShow(() => {
+  navigating = false
+  refreshProgressState()
 })
 
 onMounted(() => {
   setTimeout(() => { pageLoaded.value = true }, 100)
+  // 展示上次结果时不覆盖正在进行的测试所选星座。
+  const zodiac = testStore.selectedZodiac
   checkPreviousResult()
-  // 检测未完成的答题进度（用于显示"继续上次探索"按钮）
-  hasUnfinishedProgress.value = engine.hasSavedProgress()
+  testStore.selectedZodiac = zodiac
+  selectedZodiacName.value = zodiac ? zodiacMap[zodiac]?.name ?? '' : ''
+  refreshProgressState()
 })
 
 function starStyle(index: number) {
@@ -175,14 +203,35 @@ function handleZodiacSkip() {
   setTimeout(() => { showReady.value = true }, 100)
 }
 
-/** 开启旅程 */
+/** 重测明确传 fresh，由答题页开始新会话，绝不再次 loadProgress。 */
 function handleStartJourney() {
-  uni.navigateTo({ url: '/pagesTest/play/index' })
+  if (navigating) return
+  const saved = engine.inspectSavedProgress()
+  if (saved.status === 'unfinished' || saved.status === 'invalid' || canRecoverResult.value) {
+    uni.showModal({
+      title: '重新开始探索',
+      content: '将从第一题开始，并替换本次答题进度。之前的结果与测试历史会保留。',
+      confirmText: '重新开始',
+      success: (res) => { if (res.confirm) navigateToPlay('fresh') },
+    })
+  } else {
+    navigateToPlay('fresh')
+  }
 }
 
-/** 继续上次的答题进度（play/index.vue 的 onLoad 会自动 loadProgress） */
+function navigateToPlay(resume: 'fresh' | 'continue'): void {
+  if (navigating) return
+  navigating = true
+  uni.navigateTo({
+    url: `/pagesTest/play/index?resume=${resume}`,
+    fail: () => { navigating = false },
+  })
+}
+
+/** 继续只读取有效存档；若已答完新版存档，恢复保存结果而非重答最后一题。 */
 function handleContinueJourney() {
-  uni.navigateTo({ url: '/pagesTest/play/index' })
+  refreshProgressState()
+  if (hasUnfinishedProgress.value || canRecoverResult.value) navigateToPlay('continue')
 }
 
 /** 返回首页 */

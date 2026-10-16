@@ -8,6 +8,24 @@
         "navigationBarTextStyle": "white",
         "backgroundColor": "#0d0118"
       }
+    },
+    {
+      "path": "pages/history/index",
+      "style": {
+        "navigationBarTitleText": "历史记录",
+        "navigationBarBackgroundColor": "#1a0533",
+        "navigationBarTextStyle": "white",
+        "backgroundColor": "#0d0118"
+      }
+    },
+    {
+      "path": "pages/profile/index",
+      "style": {
+        "navigationBarTitleText": "我的",
+        "navigationBarBackgroundColor": "#1a0533",
+        "navigationBarTextStyle": "white",
+        "backgroundColor": "#0d0118"
+      }
     }
   ],
   "subPackages": [
@@ -71,24 +89,6 @@
       "root": "pagesUser",
       "pages": [
         {
-          "path": "profile/index",
-          "style": {
-            "navigationBarTitleText": "我的",
-            "navigationBarBackgroundColor": "#1a0533",
-            "navigationBarTextStyle": "white",
-            "backgroundColor": "#0d0118"
-          }
-        },
-        {
-          "path": "history/index",
-          "style": {
-            "navigationBarTitleText": "历史记录",
-            "navigationBarBackgroundColor": "#1a0533",
-            "navigationBarTextStyle": "white",
-            "backgroundColor": "#0d0118"
-          }
-        },
-        {
           "path": "invite/index",
           "style": {
             "navigationBarTitleText": "邀请好友",
@@ -143,6 +143,32 @@
       ]
     }
   ],
+  "tabBar": {
+    "color": "rgba(255,255,255,0.6)",
+    "selectedColor": "#ffd700",
+    "backgroundColor": "#0d0118",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "static/tab/home.png",
+        "selectedIconPath": "static/tab/home-active.png"
+      },
+      {
+        "pagePath": "pages/history/index",
+        "text": "历史",
+        "iconPath": "static/tab/history.png",
+        "selectedIconPath": "static/tab/history-active.png"
+      },
+      {
+        "pagePath": "pages/profile/index",
+        "text": "我的",
+        "iconPath": "static/tab/profile.png",
+        "selectedIconPath": "static/tab/profile-active.png"
+      }
+    ]
+  },
   "globalStyle": {
     "navigationBarTextStyle": "white",
     "navigationBarTitleText": "宁好星图",

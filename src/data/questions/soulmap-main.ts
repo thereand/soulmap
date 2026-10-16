@@ -15,7 +15,7 @@ export const soulmapMainQuestions: TestQuestion[] = [
     chapterId: 'ch1',
     order: 1,
     type: 'single',
-    text: '你从一片虚无中醒来，四周弥漫着银白色的迷雾。远处隐约传来悠扬的钟声，而脚下的石板路上刻满了发光的符文。迷雾中，你看到两个方向——一条路通往灯火辉煌的集市，人声鼎沸；另一条路通向一座寂静的古塔，塔顶有微弱的蓝光闪烁。',
+    text: '你从虚无中醒来，银白色迷雾弥漫四周，远处钟声悠扬，脚下石板路刻满发光符文。迷雾中隐约可见两个方向——一条通往灯火辉煌、人声鼎沸的集市，另一条通向寂静古塔，塔顶闪烁着微弱蓝光。',
     image: 'chapter1_bg',
     estimatedTime: 30,
     options: [
@@ -29,7 +29,7 @@ export const soulmapMainQuestions: TestQuestion[] = [
     chapterId: 'ch1',
     order: 2,
     type: 'single',
-    text: '迷雾渐渐散去，你发现自己站在一座巨大的星象仪前。它缓缓转动，投射出璀璨的星河。一位戴着面具的守星者出现，低声说："旅人，星象仪会为你揭示真相——但你需要选择观看的方式。"',
+    text: '迷雾散去，你站在一座巨大的星象仪前。它缓缓转动，投射出璀璨星河。一位戴面具的守星者出现，低声说："旅人，星象仪会为你揭示真相——但你需要选择观看的方式。"',
     image: 'chapter1_bg',
     estimatedTime: 25,
     options: [
@@ -44,7 +44,7 @@ export const soulmapMainQuestions: TestQuestion[] = [
     chapterId: 'ch1',
     order: 3,
     type: 'single',
-    text: '守星者摘下面具，露出一张苍老而温和的面孔。他将一块水晶碎片递给你："这是灵魂碎片的第一块。握住它，你会看到自己内心最深处的倒影。"水晶在你掌心开始发光，浮现出一段模糊的记忆——那是你童年时的画面。',
+    text: '守星者摘下面具，露出苍老而温和的面孔。他递来一块水晶碎片："这是灵魂碎片的第一块，握住它，你会看到内心最深处的倒影。"水晶在掌心发光，浮现出一段模糊的童年记忆。',
     image: 'chapter1_bg',
     estimatedTime: 25,
     options: [
@@ -58,7 +58,7 @@ export const soulmapMainQuestions: TestQuestion[] = [
     chapterId: 'ch1',
     order: 4,
     type: 'single',
-    text: '星象仪突然剧烈震动，一道裂缝从地面蔓延开来。从裂缝中飞出一群萤火虫般的光点，它们在你身边旋转，仿佛在邀你共舞。远处集市的喧闹声更清晰了，而古塔的蓝光也在有节奏地闪烁，像是在发送某种信号。',
+    text: '星象仪剧烈震动，一道裂缝从地面蔓延开来。一群萤火虫般的光点从裂缝中飞出，在你身边旋转，仿佛在邀你共舞。远处集市喧闹声越来越清晰，古塔的蓝光也在有节奏地闪烁，像在发送某种信号。',
     image: 'chapter1_bg',
     estimatedTime: 25,
     options: [
@@ -73,7 +73,7 @@ export const soulmapMainQuestions: TestQuestion[] = [
     chapterId: 'ch1',
     order: 5,
     type: 'single',
-    text: '裂缝深处传来低沉的吟唱，一本厚重的古籍从地下浮起，自动翻开到某一页。上面用金色文字写着："觉醒者，你即将踏上灵魂星图的旅程。在出发之前，请选择你最想带走的东西。"书页上浮现三件物品的幻象。',
+    text: '裂缝深处传来低沉吟唱，一本厚重古籍从地下浮起，自动翻开到某一页。金色文字写道："觉醒者，你即将踏上灵魂星图的旅程。出发前，请选择你最想带走的东西。"书页上浮现三件物品的幻象。',
     image: 'chapter1_bg',
     estimatedTime: 25,
     options: [
@@ -92,7 +92,7 @@ export const soulmapMainQuestions: TestQuestion[] = [
     chapterId: 'ch2',
     order: 1,
     type: 'single',
-    text: '穿过迷雾之门，你来到一座漂浮在空中的城市。建筑由半透明的琥珀构成，街道两旁生长着会唱歌的花朵。一位身披星辰斗篷的商人拦住你的去路，他的摊位上摆满了奇怪的器物：一把能切割时间的匕首、一瓶装着梦境的药水、一张标注了未知大陆的地图。',
+    text: '穿过迷雾之门，你来到一座漂浮在空中的城市。建筑由半透明琥珀构成，街道两旁生长着会唱歌的花朵。一位身披星辰斗篷的商人拦住去路，摊位上摆满奇怪器物：一把能切割时间的匕首、一瓶装着梦境的药水、一张标注未知大陆的地图。',
     image: 'chapter2_bg',
     estimatedTime: 30,
     options: [
@@ -107,7 +107,7 @@ export const soulmapMainQuestions: TestQuestion[] = [
     chapterId: 'ch2',
     order: 2,
     type: 'single',
-    text: '城市中央广场上，两位长老正在激烈辩论。一位是"石之心"长老，主张用逻辑和法则治理城市；另一位是"泉之眼"长老，认为应该倾听每个居民的心声。广场上的居民分成了两派，争吵不休。他们注意到你这个外来者，请你做出裁决。',
+    text: '城市中央广场上，两位长老正在激烈辩论。"石之心"长老主张用逻辑和法则治理城市，"泉之眼"长老认为应倾听每个居民的心声。居民分成两派争吵不休，他们注意到你这个外来者，请你做出裁决。',
     image: 'chapter2_bg',
     estimatedTime: 30,
     options: [
@@ -122,7 +122,7 @@ export const soulmapMainQuestions: TestQuestion[] = [
     chapterId: 'ch2',
     order: 3,
     type: 'single',
-    text: '离开广场，你走进一条狭窄的巷子。墙壁上镶嵌着无数面小镜子，每面镜子都映出不同版本的你——有的在笑，有的在哭，有的穿着华丽的铠甲，有的衣衫褴褛。巷子尽头站着一个影子般的存在，它开口说："这些都是你可能成为的人。你想知道哪一个的故事？"',
+    text: '离开广场，你走进一条狭窄巷子。墙壁上镶嵌着无数面小镜子，每面映出不同版本的你——有的在笑，有的在哭，有的穿华丽铠甲，有的衣衫褴褛。巷子尽头站着一个影子般的存在："这些都是你可能成为的人，你想知道哪一个的故事？"',
     image: 'chapter2_bg',
     estimatedTime: 25,
     options: [
@@ -137,7 +137,7 @@ export const soulmapMainQuestions: TestQuestion[] = [
     chapterId: 'ch2',
     order: 4,
     type: 'single',
-    text: '城市的边缘有一座巨大的图书馆，但所有的书都是空白的。图书管理员——一只会说话的猫头鹰——告诉你："这些书页会在你触碰时显现文字，但每个人看到的内容不同。"你伸手触碰一本书，页面上缓缓浮现出文字。',
+    text: '城市边缘有一座巨大的图书馆，但所有的书都是空白的。图书管理员——一只会说话的猫头鹰——说："这些书页会在你触碰时显现文字，但每个人看到的内容不同。"你伸手触碰一本书，页面上缓缓浮现出文字。',
     image: 'chapter2_bg',
     estimatedTime: 25,
     options: [
@@ -152,7 +152,7 @@ export const soulmapMainQuestions: TestQuestion[] = [
     chapterId: 'ch2',
     order: 5,
     type: 'single',
-    text: '当你走出图书馆，天空中突然出现了一道巨大的极光。极光中浮现出一座城市的全息投影——那是"理想之城"的蓝图。猫头鹰飞过来说："每个旅人都会看到不同的蓝图。你看到的城市，最重要的是什么？"',
+    text: '走出图书馆，天空中出现一道巨大极光。极光中浮现一座城市的全息投影——那是"理想之城"的蓝图。猫头鹰飞来说："每个旅人看到的蓝图都不同。你看到的城市，最重要的是什么？"',
     image: 'chapter2_bg',
     estimatedTime: 25,
     options: [
@@ -171,7 +171,7 @@ export const soulmapMainQuestions: TestQuestion[] = [
     chapterId: 'ch3',
     order: 1,
     type: 'single',
-    text: '极光消散后，你被传送到一片黑暗的森林。前方传来求救声——一位年轻的药师被荆棘缠住，无法脱身。但你注意到，她身旁的篮子里装满了罕见的灵魂草药，正是修复灵魂碎片所需的关键材料。如果你先救她，草药可能会被荆棘吞噬；如果你先抢收草药，她可能会受伤更深。',
+    text: '极光消散后，你被传送到一片黑暗森林。前方传来求救声——一位年轻药师被荆棘缠住。她身旁篮子里装满罕见的灵魂草药，正是修复碎片所需的关键材料。先救她，草药可能被荆棘吞噬；先抢收草药，她可能伤得更重。',
     image: 'chapter3_bg',
     estimatedTime: 30,
     options: [
@@ -186,7 +186,7 @@ export const soulmapMainQuestions: TestQuestion[] = [
     chapterId: 'ch3',
     order: 2,
     type: 'single',
-    text: '药师获救后带你来到她的村庄。村里正面临一场危机：守护村庄的灵兽生病了，唯一的治愈方法需要用到你背包里的一块灵魂碎片。但失去碎片意味着你的灵魂星图将永远不完整。村长老态龙钟地跪在你面前，身后是几十双期盼的眼睛。',
+    text: '药师带你来到她的村庄。守护灵兽病了，唯一治愈方法需要用到你背包里的一块灵魂碎片——失去它意味着你的灵魂星图永远不完整。村长跪在你面前，身后是几十双期盼的眼睛。',
     image: 'chapter3_bg',
     estimatedTime: 30,
     options: [
@@ -201,7 +201,7 @@ export const soulmapMainQuestions: TestQuestion[] = [
     chapterId: 'ch3',
     order: 3,
     type: 'single',
-    text: '深夜，你独自坐在村庄的篝火旁。火焰中突然浮现出一张面孔——那是另一个旅人，你的竞争对手。他被困在"虚空裂隙"中，如果你不伸出援手，他将永远迷失。但他曾经偷走过你的重要线索，导致你绕了很大一段弯路。火焰正在变小，你必须立刻做出决定。',
+    text: '深夜篝火旁，火焰中浮现出竞争对手的面孔——他被困在"虚空裂隙"中，不救援就永远迷失。他曾偷走你的重要线索，害你绕了远路。火焰正在变小，你必须立刻决定。',
     image: 'chapter3_bg',
     estimatedTime: 25,
     options: [
@@ -215,7 +215,7 @@ export const soulmapMainQuestions: TestQuestion[] = [
     chapterId: 'ch3',
     order: 4,
     type: 'single',
-    text: '你最终救出了竞争对手。他感激地从怀中取出一封信递给你——那是"灵魂审判者"的邀请函。信中写道："明晚月圆之时，审判之塔将开启。你将面对一个关于正义的考验。"翌日你到达审判之塔，发现大厅中央有一架天平。天平一端放着一颗跳动的心脏，另一端是一本厚重的法典。审判者的声音回荡："旅人，你认为什么才是正义的根基？"',
+    text: '你救出了竞争对手。他感激地递来"灵魂审判者"的邀请函："明晚月圆，审判之塔将开启，你将面对一场关于正义的考验。"翌日塔内，天平一端放着跳动的心脏，另一端是厚重法典。审判者问道："旅人，什么才是正义的根基？"',
     image: 'chapter3_bg',
     estimatedTime: 30,
     options: [
@@ -230,7 +230,7 @@ export const soulmapMainQuestions: TestQuestion[] = [
     chapterId: 'ch3',
     order: 5,
     type: 'single',
-    text: '审判者满意地点头，审判之塔开始崩解。在废墟中，你发现了一颗散发着温暖光芒的灵魂碎片。但碎片旁蜷缩着一个哭泣的孩子——她也是旅人，而且看起来迷路了很久，非常害怕。碎片的光芒正在减弱，再过片刻就会消失。你需要做出选择。',
+    text: '审判者点头，审判之塔开始崩解。废墟中你发现一颗散发温暖光芒的灵魂碎片，但碎片旁蜷缩着一个哭泣的孩子——她也是旅人，迷路已久，非常害怕。碎片的光芒正在减弱，片刻后就会消失。',
     image: 'chapter3_bg',
     estimatedTime: 25,
     options: [
@@ -248,7 +248,7 @@ export const soulmapMainQuestions: TestQuestion[] = [
     chapterId: 'ch4',
     order: 1,
     type: 'single',
-    text: '带着孩子走出废墟，天空突然裂开一道巨大的缝隙。暗影如潮水般倾泻而下，大地开始震颤。远处传来号角声——这是"暗潮"来袭的警报。所有人都在奔跑，混乱中你听到两个声音：一个是指挥官在组织防线，另一个是远处山洞里传来的低语，似乎藏着某种古老的秘密。',
+    text: '带着孩子走出废墟，天空裂开巨大缝隙，暗影如潮水倾泻，大地开始震颤。号角声响起——"暗潮"来袭。所有人都在奔跑，混乱中你听到两个声音：指挥官在组织防线，远处山洞里传来低语，似乎藏着古老秘密。',
     image: 'chapter4_bg',
     estimatedTime: 30,
     options: [
@@ -263,7 +263,7 @@ export const soulmapMainQuestions: TestQuestion[] = [
     chapterId: 'ch4',
     order: 2,
     type: 'single',
-    text: '暗潮中，你获得了一件"灵魂武装"——它会根据你的内心形态变化。如果你的意志坚定如铁，它会变成一面坚不可摧的盾牌；如果你的心灵灵活如水，它会变成一柄能斩断幻象的长剑。但你只有三分钟来决定它的形态，暗潮不会等你。',
+    text: '暗潮中，你获得一件"灵魂武装"——它会根据你的内心变化。意志坚定如铁，它变成坚不可摧的盾牌；心灵灵活如水，它变成斩断幻象的长剑。但你只有三分钟决定它的形态，暗潮不会等你。',
     image: 'chapter4_bg',
     estimatedTime: 25,
     options: [
@@ -278,7 +278,7 @@ export const soulmapMainQuestions: TestQuestion[] = [
     chapterId: 'ch4',
     order: 3,
     type: 'single',
-    text: '战斗结束后，你在暗潮留下的残骸中发现了一面"记忆之镜"。它展示了你过去做过的每一个决定——包括那些你后悔的。镜子中的你正在重演那些痛苦的时刻。一个声音说："你可以选择抹去一段记忆，让自己不再被它困扰；或者保留所有记忆，带着伤痕继续前行。"',
+    text: '战斗结束后，你在暗潮残骸中发现一面"记忆之镜"。它映照出你过去的每一个决定，包括那些后悔的时刻。镜中的你正重演痛苦经历。一个声音说："你可以选择抹去一段记忆，或者保留所有记忆，带着伤痕继续前行。"',
     image: 'chapter4_bg',
     estimatedTime: 25,
     options: [
@@ -293,7 +293,7 @@ export const soulmapMainQuestions: TestQuestion[] = [
     chapterId: 'ch4',
     order: 4,
     type: 'single',
-    text: '你遇到了另一位旅人——"星尘行者"。她已经独自旅行了很久，收集了比你更多的灵魂碎片。她提议结盟，但条件是：你必须按照她精心制定的计划行动，不能擅自改变路线。她的计划看起来非常周密，但你总觉得少了些什么。',
+    text: '你遇到"星尘行者"——一位独自旅行很久的旅人，收集了比你更多的灵魂碎片。她提议结盟，条件是你必须按她精心制定的计划行动，不能擅自改变路线。计划看起来很周密，但你总觉得少了些什么。',
     image: 'chapter4_bg',
     estimatedTime: 25,
     options: [
@@ -308,7 +308,7 @@ export const soulmapMainQuestions: TestQuestion[] = [
     chapterId: 'ch4',
     order: 5,
     type: 'single',
-    text: '前方出现了一座"试炼之桥"，桥面由浮动的光块组成，没有固定路径。桥的另一端是灵魂圣殿的入口。旁边竖着一块石碑，上面刻着两种过桥方式：一是按照光块闪烁的规律一步步踏过去，需要耐心和观察；二是纵身跃入光块之间的空隙，让灵魂力量托举你飞过，需要勇气和信任。',
+    text: '前方出现"试炼之桥"，桥面由浮动光块组成，没有固定路径，桥的另一端是灵魂圣殿入口。旁边石碑刻着两种过桥方式：按光块闪烁的规律一步步踏过去，需要耐心和观察；纵身跃入光块间的空隙，让灵魂力量托举你飞过，需要勇气和信任。',
     image: 'chapter4_bg',
     estimatedTime: 25,
     options: [
@@ -326,7 +326,7 @@ export const soulmapMainQuestions: TestQuestion[] = [
     chapterId: 'ch5',
     order: 1,
     type: 'single',
-    text: '灵魂圣殿的大门缓缓打开，里面是一片无垠的空白空间。圣殿守护者的声音如钟鸣般回荡："旅人，你已经走过了觉醒、探索、抉择与蜕变。现在，用你的灵魂碎片构建属于你的世界。首先——你希望这个世界有多大？"',
+    text: '灵魂圣殿大门打开，里面是一片无垠的空白空间。守护者声如钟鸣："旅人，你已走过觉醒、探索、抉择与蜕变。现在用灵魂碎片构建属于你的世界——首先，你希望这个世界有多大？"',
     image: 'chapter5_bg',
     estimatedTime: 30,
     options: [
@@ -341,7 +341,7 @@ export const soulmapMainQuestions: TestQuestion[] = [
     chapterId: 'ch5',
     order: 2,
     type: 'single',
-    text: '你开始塑造世界的地形。手中浮现出三种元素之力：大地之力可以创造坚固的山脉和平原，流水之力可以雕刻蜿蜒的河流和湖泊，风之力可以塑造不断变化的沙丘和云海。守护者说："你选择的元素，将决定这个世界的运行方式。"',
+    text: '你开始塑造世界地形。手中浮现三种元素之力：大地之力创造坚固山脉和平原，流水之力雕刻蜿蜒河流和湖泊，风之力塑造不断变化的沙丘和云海。守护者说："你选择的元素，将决定这个世界的运行方式。"',
     image: 'chapter5_bg',
     estimatedTime: 25,
     options: [
@@ -356,7 +356,7 @@ export const soulmapMainQuestions: TestQuestion[] = [
     chapterId: 'ch5',
     order: 3,
     type: 'single',
-    text: '世界初具雏形，但还缺少"居民"。你可以从灵魂碎片中召唤三种存在：守序者会建立规则维护秩序，梦想家会创造艺术传播灵感，旅行者会不断探索带回新故事。守护者问你："你希望你的世界里，谁是最重要的存在？"',
+    text: '世界初具雏形，还缺少"居民"。你可以从灵魂碎片中召唤三种存在：守序者建立规则维护秩序，梦想家创造艺术传播灵感，旅行者不断探索带回新故事。守护者问："你希望谁是最重要的存在？"',
     image: 'chapter5_bg',
     estimatedTime: 25,
     options: [
@@ -371,7 +371,7 @@ export const soulmapMainQuestions: TestQuestion[] = [
     chapterId: 'ch5',
     order: 4,
     type: 'single',
-    text: '你的世界已经生机勃勃，但还缺少一条最重要的法则——世界的"时间规则"。你可以选择：让时间匀速前进如一条直线，一切井然有序；让时间像四季一样循环往复，周而复始；或者让时间自由流动，有时快有时慢，充满不确定性。',
+    text: '世界生机勃勃，但还缺最重要的法则——"时间规则"。你可以选择：让时间匀速前进如直线，一切井然有序；让时间像四季循环往复；或让时间自由流动，有时快有时慢，充满不确定性。',
     image: 'chapter5_bg',
     estimatedTime: 25,
     options: [
@@ -386,7 +386,7 @@ export const soulmapMainQuestions: TestQuestion[] = [
     chapterId: 'ch5',
     order: 5,
     type: 'single',
-    text: '灵魂星图的旅程即将结束。守护者最后一次出现，他问你："旅人，在你即将离开这个世界之前——你想在哪里安家？"他展示了三个地方：山顶的石塔可以俯瞰整个世界，窗明几净一切尽收眼底；森林中的小木屋被树木环抱，安静而温暖；海边随潮汐移动的船屋，每天醒来窗外的风景都不同。',
+    text: '旅程即将结束。守护者最后一次出现："旅人，你想在哪里安家？"他展示三个地方：山顶石塔俯瞰整个世界，一切尽收眼底；森林小木屋被树木环抱，安静温暖；海边随潮汐移动的船屋，每天醒来窗外风景都不同。',
     image: 'chapter5_bg',
     estimatedTime: 30,
     options: [

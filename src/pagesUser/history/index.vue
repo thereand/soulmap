@@ -1,41 +1,30 @@
 <!--
-  灵魂星图 - 历史记录页
-  展示用户的测试历史列表
+  已迁移至 pages/history/index（tabBar 页面）
+  此文件保留但不再使用，页面已从 pages.json subPackages 移除
 -->
 <template>
-  <view class="page-history">
-    <text class="page-title">历史记录</text>
-    <text class="page-desc">你的测试历程（待实现）</text>
+  <view class="page-redirect">
+    <text class="redirect-text">页面已迁移，正在跳转...</text>
   </view>
 </template>
 
 <script setup lang="ts">
-import { onLoad } from '@dcloudio/uni-app'
-
-onLoad(() => {
-  console.log('[Page] 历史记录页加载')
+import { onMounted } from 'vue'
+onMounted(() => {
+  uni.switchTab({ url: '/pages/history/index' })
 })
 </script>
 
 <style lang="scss" scoped>
-.page-history {
+.page-redirect {
   min-height: 100vh;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: $spacing-xl;
+  background: #0d0118;
 }
-
-.page-title {
-  font-size: $font-xxl;
-  font-weight: bold;
-  color: $text-primary;
-  margin-bottom: $spacing-md;
-}
-
-.page-desc {
-  font-size: $font-base;
-  color: $text-secondary;
+.redirect-text {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.5);
 }
 </style>
