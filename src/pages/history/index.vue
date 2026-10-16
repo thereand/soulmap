@@ -92,6 +92,9 @@
 
       <view class="safe-bottom" />
     </scroll-view>
+
+    <!-- 底部 iOS 风格 tabBar -->
+    <CustomTabBar />
   </view>
 </template>
 
@@ -101,8 +104,11 @@ import { onLoad, onShow } from '@dcloudio/uni-app'
 import { useTestStore } from '@/stores/test'
 import { personalityTypes } from '@/data/results/types'
 import { guideCombinations } from '@/data/guides'
+import CustomTabBar from '@/components/shared/CustomTabBar.vue'
+import { useTabBar } from '@/composables/useTabBar'
 
 const testStore = useTestStore()
+const { setActive } = useTabBar()
 
 /** 测试历史（本地，最多 50 条） */
 const history = ref<any[]>([])
@@ -120,6 +126,8 @@ onLoad(() => {
 onShow(() => {
   // 每次页面显示时刷新（从结果页返回时自动更新）
   loadHistory()
+  // 同步 tabBar 选中态到"历史"
+  setActive(1)
 })
 
 /** 去重后的类型数量 */
@@ -460,7 +468,7 @@ function handleClearHistory() {
 }
 
 .safe-bottom {
-  height: env(safe-area-inset-bottom);
-  min-height: 120rpx;
+  height: calc(70px + env(safe-area-inset-bottom));
+  min-height: 70px;
 }
 </style>

@@ -76,6 +76,9 @@
 
     <!-- 隐私政策与用户协议同意弹窗（合规要求：用户主动阅读并勾选） -->
     <PrivacyConsent :visible="showConsent" @agreed="onConsentAgreed" />
+
+    <!-- 底部 iOS 风格 tabBar -->
+    <CustomTabBar />
   </view>
 </template>
 
@@ -83,6 +86,8 @@
 import { ref, onMounted } from 'vue'
 import { onLoad, onShow } from '@dcloudio/uni-app'
 import PrivacyConsent from '@/components/shared/PrivacyConsent.vue'
+import CustomTabBar from '@/components/shared/CustomTabBar.vue'
+import { useTabBar } from '@/composables/useTabBar'
 import {
   hasAgreedCurrentVersion,
   markAllAgreed,
@@ -92,6 +97,7 @@ const pageLoaded = ref(false)
 const displayCount = ref('12,863')
 /** 隐私政策与用户协议弹窗是否展示 */
 const showConsent = ref(false)
+const { setActive } = useTabBar()
 
 onLoad((query) => {
   console.log('[Page] 首页加载', query)
@@ -106,6 +112,8 @@ onLoad((query) => {
 })
 
 onShow(() => {
+  // 同步 tabBar 选中态到"首页"
+  setActive(0)
   // 每次回到首页都检查一次（协议更新 / 用户未同意时自动弹出）
   if (!hasAgreedCurrentVersion()) {
     showConsent.value = true
@@ -230,6 +238,7 @@ function openTerms() {
   justify-content: center;
   padding: 60rpx 48rpx;
   padding-top: 120rpx;
+  padding-bottom: calc(180rpx + env(safe-area-inset-bottom));
   background: linear-gradient(180deg, #0d0118 0%, #1a0533 40%, #140228 70%, #0d0118 100%);
   position: relative;
   overflow: hidden;

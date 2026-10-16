@@ -203,6 +203,9 @@
 
       <view class="safe-bottom" />
     </scroll-view>
+
+    <!-- 底部 iOS 风格 tabBar -->
+    <CustomTabBar />
   </view>
 </template>
 
@@ -214,12 +217,15 @@ import { useTestStore } from '@/stores/test'
 import { useAtlas } from '@/composables/useAtlas'
 import { useInvite } from '@/composables/useInvite'
 import { personalityTypes } from '@/data/results/types'
+import CustomTabBar from '@/components/shared/CustomTabBar.vue'
+import { useTabBar } from '@/composables/useTabBar'
 import type { MBTIType } from '@/types/test'
 
 const userStore = useUserStore()
 const testStore = useTestStore()
 const atlas = useAtlas()
 const invite = useInvite()
+const { setActive } = useTabBar()
 
 /** 测试历史（本地，最多 50 条） */
 const history = ref<any[]>([])
@@ -237,6 +243,8 @@ onLoad(() => {
 onShow(() => {
   // 每次页面显示时刷新数据（从其他页面返回时自动更新）
   loadData()
+  // 同步 tabBar 选中态到"我的"
+  setActive(2)
 })
 
 onMounted(() => {
@@ -772,7 +780,7 @@ function handleLogout() {
 }
 
 .safe-bottom {
-  height: env(safe-area-inset-bottom);
-  min-height: 120rpx;
+  height: calc(70px + env(safe-area-inset-bottom));
+  min-height: 70px;
 }
 </style>
