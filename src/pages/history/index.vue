@@ -1,5 +1,5 @@
 <!--
-  灵魂星图 - 历史记录页（tabBar 页面）
+  人格星图 - 历史记录页（tabBar 页面）
   展示用户的测试历史列表，从 SOULMAP_TEST_HISTORY 读取
 -->
 <template>

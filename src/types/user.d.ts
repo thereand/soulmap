@@ -1,5 +1,5 @@
 /**
- * 灵魂星图 - 用户相关类型定义
+ * 人格星图 - 用户相关类型定义
  */
 
 import type { MBTIType, TestResult } from './test'

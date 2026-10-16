@@ -1,5 +1,5 @@
 <!--
-  灵魂星图 - 付费墙组件
+  人格星图 - 付费墙组件
   报告目录预览 + 毛玻璃遮罩 + 解锁CTA + 社会认同 + 限时倒计时
 -->
 <template>
@@ -127,7 +127,7 @@ const emit = defineEmits<{
 /** 报告目录结构 */
 const sections = [
   { icon: '🧠', title: '深度性格分析', desc: '500字核心剖析' },
-  { icon: '💫', title: '内心世界揭秘', desc: '你的灵魂深处' },
+  { icon: '💫', title: '内心世界揭秘', desc: '你的人格深处' },
   { icon: '🤝', title: '社交风格解读', desc: '你的社交人格' },
   { icon: '💕', title: '恋爱风格指南', desc: '爱情中的你' },
   { icon: '💼', title: '职业发展建议', desc: '最适合你的方向' },

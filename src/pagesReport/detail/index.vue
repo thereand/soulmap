@@ -1,5 +1,5 @@
 <!--
-  灵魂星图 - 付费报告详情页
+  人格星图 - 付费报告详情页
   展示完整的付费人格分析报告，分段呈现各维度内容
 -->
 <template>
@@ -172,9 +172,9 @@
 
         <!-- 追加售卖（受 UPSELL_ENABLED 开关控制） -->
         <view v-if="showUpsell" class="upsell-card">
-          <text class="upsell-card__title">🔮 进阶报告</text>
+          <text class="upsell-card__title">📊 进阶报告</text>
           <text class="upsell-card__desc">
-            解锁人格兼容性分析、年度运势预测、专属成长计划
+            解锁人格兼容性分析、阶段性成长建议、专属成长计划
           </text>
           <view class="upsell-card__price">
             <text class="upsell-card__original">¥39.9</text>

@@ -1,5 +1,5 @@
 /**
- * 灵魂星图 - 配对报告模板
+ * 人格星图 - 配对报告模板
  *
  * 由于 16×16 = 256 组合（对称去重后 136 组），此文件提供：
  *  - 少量高频热门 CP 的手写报告
@@ -47,7 +47,7 @@ export const featuredReports: Record<string, Partial<CompatibilityReport>> = {
     growthAdvice: '给彼此留出独立空间的同时，用共同项目（旅行/创作）作为纽带。',
   },
   [pairKey('INFJ', 'ENFP')]: {
-    summary: '你们是灵魂彼此认领的旅人，一个善于倾听，一个善于点燃。',
+    summary: '你们是人格彼此认领的旅人，一个善于倾听，一个善于点燃。',
     strengths: [
       '两人都拥有深度共情能力，能读懂对方未说出口的情绪',
       'ENFP 拉着 INFJ 走出内心迷宫',
@@ -151,7 +151,7 @@ export const featuredReports: Record<string, Partial<CompatibilityReport>> = {
     growthAdvice: '轮流选择"节奏"：一次跟着舞步，一次跟着沉思。',
   },
   [pairKey('ENTP', 'INFJ')]: {
-    summary: '辩手与预言家的组合，一场持续了一辈子的思想恋爱。',
+    summary: '辩手与预见家的组合，一场持续了一辈子的思想恋爱。',
     strengths: [
       'ENTP 的思辨激活 INFJ 的深层理解',
       'INFJ 的洞察力让 ENTP 停下来听自己内心',

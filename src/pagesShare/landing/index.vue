@@ -1,10 +1,10 @@
 <!--
-  灵魂星图 - 分享落地页
+  人格星图 - 分享落地页
 
   当别人通过分享链接 / 小程序码进入时看到的页面：
   - 从 URL 参数获取分享者的结果类型（?type=INTJ）
   - 展示分享者的星灵类型卡片摘要
-  - CTA 引导新用户开始自己的灵魂探索
+  - CTA 引导新用户开始自己的人格探索
 -->
 <template>
   <view class="page-landing">
@@ -47,7 +47,7 @@
         </view>
 
         <!-- TA 是 -->
-        <text class="landing-card__label">TA 的灵魂星灵</text>
+        <text class="landing-card__label">TA 的人格星灵</text>
 
         <!-- 星灵名称 -->
         <text class="landing-card__name">{{ personalityData.name }}</text>
@@ -89,8 +89,8 @@
           <view class="landing-default__orb-dot landing-default__orb-dot--2" />
           <view class="landing-default__orb-dot landing-default__orb-dot--3" />
         </view>
-        <text class="landing-default__title">发现你的灵魂星灵</text>
-        <text class="landing-default__sub">5 分钟沉浸测试，看见你的灵魂形状</text>
+        <text class="landing-default__title">发现你的人格星灵</text>
+        <text class="landing-default__sub">5 分钟沉浸测试，看见你的人格形状</text>
       </view>
 
       <!-- 功能亮点三卡 -->
@@ -103,7 +103,7 @@
         <view class="features__item">
           <view class="features__icon">✨</view>
           <text class="features__title">四大星灵向导</text>
-          <text class="features__desc">烈焰 / 深渊 / 森林 / 星辰，找到与你灵魂共振的向导组合</text>
+          <text class="features__desc">烈焰 / 深渊 / 森林 / 星辰，找到与你人格共振的向导组合</text>
         </view>
         <view class="features__item">
           <view class="features__icon">♈</view>
@@ -146,19 +146,19 @@
 
       <!-- 好奇心引导（仅当分享者类型已知时展示） -->
       <view v-if="personalityData" class="landing-hook">
-        <text class="landing-hook__text">你和 TA 是什么灵魂关系？</text>
-        <text class="landing-hook__sub">每个人的灵魂星灵都独一无二</text>
+        <text class="landing-hook__text">你和 TA 是什么人格关系？</text>
+        <text class="landing-hook__sub">每个人的人格星灵都独一无二</text>
       </view>
 
       <!-- CTA 按钮 -->
       <view class="landing-cta" @tap="handleStartTest">
         <view class="landing-cta__glow" :style="ctaGlowStyle" />
-        <text class="landing-cta__text">✦  开始我的灵魂探索  ✦</text>
+        <text class="landing-cta__text">✦  开始我的人格探索  ✦</text>
       </view>
 
       <!-- 次级入口 -->
       <view class="landing-secondary" @tap="handleStartTest">
-        <text class="landing-secondary__text">3 分钟，发现你的灵魂星灵</text>
+        <text class="landing-secondary__text">3 分钟，发现你的人格星灵</text>
         <text class="landing-secondary__arrow">→</text>
       </view>
 
@@ -194,7 +194,7 @@ const elementIcons: Record<string, string> = {
 /* ===== 报告预览卡片 ===== */
 const previewCards = [
   { emoji: '🧠', title: '深度性格分析', desc: '500 字核心剖析，看见你人格的骨架与驱动力' },
-  { emoji: '💫', title: '内心世界揭秘', desc: '你的灵魂深处藏着哪些未被看见的渴望与恐惧' },
+  { emoji: '💫', title: '内心世界揭秘', desc: '你的人格深处藏着哪些未被看见的渴望与恐惧' },
   { emoji: '💼', title: '职业发展建议', desc: '结合 MBTI 与星灵向导，给出最契合你的方向' },
 ]
 
@@ -320,10 +320,10 @@ function handleStartTest(): void {
 import { onShareAppMessage } from '@dcloudio/uni-app'
 
 onShareAppMessage(() => {
-  const name = personalityData.value?.name || '灵魂星灵'
+  const name = personalityData.value?.name || '人格星灵'
   const code = typeCode.value || 'INTJ'
   return {
-    title: `TA 的灵魂星灵是「${name}」，快来测测你的！`,
+    title: `TA 的人格星灵是「${name}」，快来测测你的！`,
     path: `/pagesShare/landing/index?type=${code}`,
   }
 })

@@ -1,5 +1,5 @@
 /**
- * 灵魂星图 - 分享逻辑组合式函数
+ * 人格星图 - 分享逻辑组合式函数
  *
  * 封装海报生成、保存相册、好友分享、朋友圈分享、
  * H5 链接复制及小程序 onShareAppMessage 配置等完整分享工具链。
@@ -195,7 +195,7 @@ export function useShare() {
    */
   function getShareConfig(resultCode: string, typeName: string): ShareConfig {
     return {
-      title: `我的灵魂星灵是「${typeName}」，来测测你的！`,
+      title: `我的人格星灵是「${typeName}」，来测测你的！`,
       path: `/pagesShare/landing/index?type=${resultCode}`,
       imageUrl: posterPath.value || undefined,
     }

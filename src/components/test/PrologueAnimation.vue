@@ -1,5 +1,5 @@
 <!--
-  灵魂星图 - 序幕星空动画
+  人格星图 - 序幕星空动画
   全屏星图渐入动画：星辰汇聚 → 文字序列 → 中央光芒绽放
 -->
 <template>
@@ -27,7 +27,7 @@
 
     <!-- 文字序列 -->
     <view class="text-sequence">
-      <text class="sequence-line sequence-line--1">在灵魂星图的深处...</text>
+      <text class="sequence-line sequence-line--1">在人格星图的深处...</text>
       <text class="sequence-line sequence-line--2">四位星灵正在等待觉醒...</text>
       <text class="sequence-line sequence-line--3">你的旅程，即将开始</text>
     </view>

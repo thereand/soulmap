@@ -1,5 +1,5 @@
 <!--
-  灵魂星图 - 首页
+  人格星图 - 首页
   深色星空主题，品牌视觉 + 核心CTA入口
 -->
 <template>
@@ -19,7 +19,7 @@
         <view class="logo-core" />
       </view>
       <text class="brand-title">宁好星图</text>
-      <text class="brand-subtitle">探索你的灵魂星灵</text>
+      <text class="brand-subtitle">探索你的人格星灵</text>
     </view>
 
     <!-- 中央星球视觉 -->
@@ -45,7 +45,7 @@
       <view class="cta-btn" @tap="handleStart">
         <view class="cta-btn__glow" />
         <view class="cta-btn__inner">
-          <text class="cta-btn__text">开始灵魂探索</text>
+          <text class="cta-btn__text">开始人格探索</text>
           <text class="cta-btn__arrow">→</text>
         </view>
       </view>
@@ -55,16 +55,16 @@
     <view class="footer-section anim-hidden" :class="{ 'anim-fade-in-up': pageLoaded }" style="animation-delay: 0.6s">
       <view class="footer-counter">
         <text class="footer-counter__num">{{ displayCount }}</text>
-        <text class="footer-counter__label">位探索者已完成灵魂之旅</text>
+        <text class="footer-counter__label">位探索者已完成人格之旅</text>
       </view>
       <view class="footer-divider" />
-      <text class="footer-desc">5分钟 · 36道灵魂之问</text>
+      <text class="footer-desc">5分钟 · 36道人格之问</text>
       <text class="footer-hint">趣味人格探索，帮你更了解自己</text>
 
       <!-- 合规声明区 -->
       <view class="footer-legal">
         <text class="footer-legal__disclaimer">
-          本应用为趣味人格探索工具，结果仅供娱乐参考，不作为专业心理诊断或医学建议。
+          本应用为趣味人格探索工具，不涉及占卜、算命、运势预测等内容，结果仅供娱乐参考，不作为专业心理诊断或医学建议。
         </text>
         <view class="footer-legal__links">
           <text class="footer-legal__link" @tap="openPrivacy">《隐私协议》</text>

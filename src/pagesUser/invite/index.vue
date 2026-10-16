@@ -1,5 +1,5 @@
 <!--
-  灵魂星图 - 邀请进度页
+  人格星图 - 邀请进度页
   查看已邀请人数、进度、奖励领取
 -->
 <template>
@@ -7,7 +7,7 @@
     <view class="invite-page__hero">
       <text class="invite-page__title">✨ 邀请好友解锁</text>
       <text class="invite-page__subtitle">
-        每邀请一位好友完成灵魂探索，你就能解锁一份新奖励
+        每邀请一位好友完成人格探索，你就能解锁一份新奖励
       </text>
     </view>
 

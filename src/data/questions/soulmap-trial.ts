@@ -1,7 +1,7 @@
 import type { TestQuestion } from '@/types/test'
 
 /**
- * 灵魂星图 — 第六章：试炼（压力情境下的人格投射）
+ * 人格星图 — 第六章：试炼（压力情境下的人格投射）
  * 6道沉浸式剧情化测试题目，考验旅人在极端压力下的真实本性
  */
 export const soulmapTrialQuestions: TestQuestion[] = [
@@ -75,7 +75,7 @@ export const soulmapTrialQuestions: TestQuestion[] = [
     chapterId: 'ch6',
     order: 3,
     type: 'single',
-    text: '镜之大殿深处，一架黄金天平悬浮空中。审判者的声音再度响起："将你最珍贵的记忆放上天平，它将被永远封存为灵魂星图的基石。"你闭上眼，脑海中浮现三段画面——你需要选择其中一段。',
+    text: '镜之大殿深处，一架黄金天平悬浮空中。审判者的声音再度响起："将你最珍贵的记忆放上天平，它将被永远封存为人格星图的基石。"你闭上眼，脑海中浮现三段画面——你需要选择其中一段。',
     image: 'chapter6_bg',
     estimatedTime: 25,
     options: [

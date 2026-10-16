@@ -1,5 +1,5 @@
 <!--
-  灵魂星图 - 数据报表页
+  人格星图 - 数据报表页
   基于本地 SOULMAP_TEST_HISTORY 的纯前端可视化（零后端调用）
   可视化项：MBTI 16 类型分布 / 四维度均值 / 向导亲和度 / 星灵图鉴进度 / 答题时长趋势 / 星座选择
 -->
@@ -8,15 +8,19 @@
     <scroll-view scroll-y class="stats-scroll" :style="{ height: '100vh' }">
       <!-- Hero -->
       <view class="hero">
-        <text class="hero__title">你的灵魂数据</text>
+        <text class="hero__title">你的人格数据</text>
         <text class="hero__desc">基于本地 {{ history.length }} 次测试记录的聚合分析</text>
       </view>
 
       <!-- 空状态 -->
       <view v-if="history.length === 0" class="empty">
-        <text class="empty__emoji">📊</text>
+        <view class="empty__icon">
+          <view class="empty__icon-bar empty__icon-bar--1" />
+          <view class="empty__icon-bar empty__icon-bar--2" />
+          <view class="empty__icon-bar empty__icon-bar--3" />
+        </view>
         <text class="empty__title">暂无数据</text>
-        <text class="empty__desc">完成至少 1 次测试后才能看到你的灵魂数据报表</text>
+        <text class="empty__desc">完成至少 1 次测试后才能看到你的人格数据报表</text>
         <view class="empty__btn" @tap="goTest">
           <text class="empty__btn-text">去做测试</text>
         </view>
@@ -382,7 +386,29 @@ function goTest() {
   gap: $spacing-md;
   padding: $spacing-xl;
 
-  &__emoji { font-size: 96rpx; }
+  &__icon {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 12rpx;
+    width: 120rpx;
+    height: 120rpx;
+    border-radius: 50%;
+    border: 2rpx solid rgba(255, 255, 255, 0.2);
+    padding: 20rpx 16rpx;
+    box-sizing: border-box;
+  }
+
+  &__icon-bar {
+    width: 20rpx;
+    border-radius: 6rpx 6rpx 0 0;
+    background: rgba(255, 255, 255, 0.4);
+
+    &--1 { height: 28rpx; }
+    &--2 { height: 48rpx; }
+    &--3 { height: 36rpx; }
+  }
+
   &__title { font-size: $font-lg; font-weight: 700; color: $text-primary; }
   &__desc { font-size: $font-sm; color: $text-secondary; text-align: center; line-height: 1.7; }
 

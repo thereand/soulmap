@@ -32,7 +32,7 @@
         </view>
       </view>
 
-      <!-- 2. 灵魂碎片拼图 -->
+      <!-- 2. 人格碎片拼图 -->
       <view v-if="currentGameId === 'soul-puzzle'" class="game-area soul-puzzle">
         <view class="sp-grid">
           <view
@@ -125,8 +125,8 @@ const currentGameId = computed(() => gameId.value)
 
 const gameTitles: Record<MiniGameId, string> = {
   'energy-collect': '能量收集',
-  'soul-puzzle': '灵魂碎片拼图',
-  'guide-pick': '灵魂共鸣',
+  'soul-puzzle': '人格碎片拼图',
+  'guide-pick': '人格共鸣',
   'star-sequence': '星图点亮',
 }
 
@@ -232,12 +232,12 @@ function collectStar(idx: number): void {
     finishWithReward({
       guideBonus: { star: 5, flame: 3 },
       fragmentBonus: 1,
-      description: '能量收集完毕！星之向导亲和度 +5，获得额外灵魂碎片',
+      description: '能量收集完毕！星之向导亲和度 +5，获得额外人格碎片',
     })
   }
 }
 
-/* ===== 2. 灵魂碎片拼图 ===== */
+/* ===== 2. 人格碎片拼图 ===== */
 
 interface PuzzlePiece { correct: boolean; selected: boolean }
 
@@ -270,7 +270,7 @@ function togglePuzzlePiece(idx: number): void {
     finishWithReward({
       guideBonus: { abyss: 4, forest: 2 },
       fragmentBonus: 1,
-      description: '碎片归位完成！深渊向导亲和度 +4，获得灵魂碎片',
+      description: '碎片归位完成！深渊向导亲和度 +4，获得人格碎片',
     })
   }
 }
@@ -357,7 +357,7 @@ function tapSequenceStar(idx: number): void {
       finishWithReward({
         guideBonus: { star: 5, abyss: 2 },
         fragmentBonus: 1,
-        description: '星图全部点亮！星之向导亲和度 +5，获得灵魂碎片',
+        description: '星图全部点亮！星之向导亲和度 +5，获得人格碎片',
       })
     }
   } else {
@@ -487,7 +487,7 @@ watch(currentGameId, (id) => {
   &--warn { color: #ff6b6b; }
 }
 
-/* ===== 灵魂碎片拼图 ===== */
+/* ===== 人格碎片拼图 ===== */
 .sp-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

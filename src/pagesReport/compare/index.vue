@@ -1,15 +1,15 @@
 <!--
-  灵魂星图 - 灵魂契合度对比页
+  人格星图 - 人格契合度对比页
   展示：双方星灵卡片 → 契合度分数 → 关系标签 → 免费概述 → 付费详细报告
 -->
 <template>
   <view class="page-compare">
     <view v-if="loading" class="loading">
-      <text class="loading__text">灵魂正在对位...</text>
+      <text class="loading__text">人格正在对位...</text>
     </view>
 
     <view v-else-if="!hasPartner" class="waiting">
-      <text class="waiting__title">邀请好友对比灵魂契合度</text>
+      <text class="waiting__title">邀请好友对比人格契合度</text>
       <text class="waiting__desc">
         当前对比码：<text class="waiting__code">{{ compareCode || '生成中...' }}</text>
       </text>
@@ -88,7 +88,7 @@
 
         <view class="paywall__cta" @tap="handleUnlock">
           <text class="paywall__price">¥19.9</text>
-          <text class="paywall__cta-text">解锁灵魂契合详细报告</text>
+          <text class="paywall__cta-text">解锁人格契合详细报告</text>
         </view>
       </view>
 
@@ -157,7 +157,7 @@ const userA = computed<ComparePartner | null>(() => record.value?.userA || null)
 const userB = computed<ComparePartner | null>(() => record.value?.userB || null)
 const hasPartner = computed(() => !!(userA.value && userB.value))
 const compatibility = computed(() => record.value?.compatibility ?? report.value?.overallScore ?? 0)
-const relationLabel = computed(() => record.value?.relationLabel || report.value?.relationLabel || '灵魂知己')
+const relationLabel = computed(() => record.value?.relationLabel || report.value?.relationLabel || '人格知己')
 /** 对比报告是否已解锁
  *  - COMPARE_PAID_ENABLED=false：强制视为已解锁，直接展示完整对比内容
  *  - COMPARE_PAID_ENABLED=true：跟随云端 comparisons.isPaid 字段
@@ -272,7 +272,7 @@ async function handleUnlock() {
   }
 
   uni.showModal({
-    title: '解锁灵魂契合详细报告',
+    title: '解锁人格契合详细报告',
     content: '本次支付 ¥19.9，解锁后双方都可查看详细内容。',
     confirmText: '立即支付',
     success: async (res) => {
@@ -335,8 +335,8 @@ defineExpose({
     const nameA = nameOf(userA.value)
     return {
       title: hasPartner.value
-        ? `我们是「${relationLabel.value}」！契合度 ${compatibility.value}%，来看看你和我的灵魂契合度`
-        : `${nameA} 邀请你测测灵魂契合度`,
+        ? `我们是「${relationLabel.value}」！契合度 ${compatibility.value}%，来看看你和我的人格契合度`
+        : `${nameA} 邀请你测测人格契合度`,
       path: `/pagesReport/compare/index?code=${compareCode.value}`,
     }
   },

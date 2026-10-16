@@ -1,5 +1,5 @@
 <!--
-  灵魂星图 - 个人中心页（tabBar 页面）
+  人格星图 - 个人中心页（tabBar 页面）
   枢纽页：用户信息 + 测试统计 + 功能入口 + 星灵图鉴 + 邀请 + 客服/协议 + 账号操作
 -->
 <template>
@@ -130,7 +130,7 @@
           <view class="menu__body">
             <text class="menu__label">邀请好友</text>
             <text class="menu__desc">
-              {{ invite.invitedCount.value ? `已邀请 ${invite.invitedCount.value} 位，继续邀请解锁奖励` : '邀请好友一起测灵魂契合度' }}
+              {{ invite.invitedCount.value ? `已邀请 ${invite.invitedCount.value} 位，继续邀请解锁奖励` : '邀请好友一起测人格契合度' }}
             </text>
           </view>
           <text class="menu__arrow">→</text>

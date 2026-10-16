@@ -1,5 +1,5 @@
 <!--
-  灵魂星图 - 隐私协议 / 用户协议页
+  人格星图 - 隐私协议 / 用户协议页
   通过 query 参数 type=privacy|terms 切换
 -->
 <template>

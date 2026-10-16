@@ -1,5 +1,5 @@
 /**
- * 灵魂星图 - 星灵图鉴卡片定义
+ * 人格星图 - 星灵图鉴卡片定义
  *
  * 共 19 张卡片：
  *  - 16 张 MBTI 类型卡（稀有度与 PersonalityTypeData 一致）
@@ -57,7 +57,7 @@ const mbtiCards: AtlasCard[] = [
   },
   {
     id: 'mbti_INFJ',
-    name: '灵光预言者',
+    name: '灵光预见者',
     type: 'mbti',
     mbtiType: 'INFJ',
     guides: ['abyss', 'forest'],
@@ -74,7 +74,7 @@ const mbtiCards: AtlasCard[] = [
     mbtiType: 'INTP',
     guides: ['abyss', 'star'],
     rarity: 'SR',
-    description: '用无限好奇解构宇宙规则的灵魂',
+    description: '用无限好奇解构宇宙规则的人格',
     unlockCondition: '测试结果为 INTP 时解锁',
   },
   {
@@ -84,7 +84,7 @@ const mbtiCards: AtlasCard[] = [
     mbtiType: 'ENTP',
     guides: ['flame', 'star'],
     rarity: 'SR',
-    description: '在混沌中发现规律的灵魂火花',
+    description: '在混沌中发现规律的人格火花',
     unlockCondition: '测试结果为 ENTP 时解锁',
   },
   {
@@ -94,7 +94,7 @@ const mbtiCards: AtlasCard[] = [
     mbtiType: 'INFP',
     guides: ['forest', 'star'],
     rarity: 'SR',
-    description: '将星尘化作诗篇的温柔灵魂',
+    description: '将星尘化作诗篇的温柔人格',
     unlockCondition: '测试结果为 INFP 时解锁',
   },
   {
@@ -124,7 +124,7 @@ const mbtiCards: AtlasCard[] = [
     mbtiType: 'ISFP',
     guides: ['forest', 'star'],
     rarity: 'SR',
-    description: '在自然和美中找到灵魂归宿',
+    description: '在自然和美中找到人格归宿',
     unlockCondition: '测试结果为 ISFP 时解锁',
   },
 
@@ -136,7 +136,7 @@ const mbtiCards: AtlasCard[] = [
     mbtiType: 'ISTJ',
     guides: ['abyss'],
     rarity: 'R',
-    description: '如磐石般坚定守护秩序的灵魂',
+    description: '如磐石般坚定守护秩序的人格',
     unlockCondition: '测试结果为 ISTJ 时解锁',
   },
   {
@@ -166,7 +166,7 @@ const mbtiCards: AtlasCard[] = [
     mbtiType: 'ESFJ',
     guides: ['flame', 'forest'],
     rarity: 'R',
-    description: '散发温暖星光庇护周围一切的灵魂',
+    description: '散发温暖星光庇护周围一切的人格',
     unlockCondition: '测试结果为 ESFJ 时解锁',
   },
   {
@@ -211,7 +211,7 @@ const comboCards: AtlasCard[] = [
     comboId: 'quad',
     guides: ['flame', 'abyss', 'forest', 'star'],
     rarity: 'SSR',
-    description: '四元素和谐统一的极致灵魂形态',
+    description: '四元素和谐统一的极致人格形态',
     unlockCondition: '获得四星齐辉组合时解锁',
   },
   {

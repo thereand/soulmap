@@ -1,5 +1,5 @@
 /**
- * 灵魂星图 — 四大星灵向导定义 & 15 种组合
+ * 人格星图 — 四大星灵向导定义 & 15 种组合
  */
 import type { GuideDefinition, GuideCombination, GuideId, GuideAffinityScores } from '@/types/guide'
 
@@ -17,7 +17,7 @@ export const guideDefinitions: GuideDefinition[] = [
     trait: '热情 · 勇敢 · 行动力',
     description: '烈焰之灵将点燃你内心的火焰，帮助你发现隐藏在热情背后的真正力量。',
     speakStyle: '直接、激昂、短句、感叹号',
-    philosophy: '命运由我锻造',
+    philosophy: '前路由我锻造',
   },
   {
     id: 'abyss',
@@ -71,7 +71,7 @@ export const guideCombinations: GuideCombination[] = [
     guides: ['flame'],
     type: 'single',
     coreTraits: ['纯粹的行动者', '直觉与勇气是你的一切', '永不停歇的开拓者'],
-    description: '你的灵魂深处燃烧着一团永不熄灭的火焰。没有犹豫，没有退缩——当你决定了一件事，整个世界都会为你的决心让路。你是最纯粹的行动者，用勇气和热情书写属于自己的传奇。',
+    description: '你的人格深处燃烧着一团永不熄灭的火焰。没有犹豫，没有退缩——当你决定了一件事，整个世界都会为你的决心让路。你是最纯粹的行动者，用勇气和热情书写属于自己的传奇。',
     mbtiNote: '常见于 ESTP、ENTJ、ESFP 类型',
   },
   {
@@ -80,7 +80,7 @@ export const guideCombinations: GuideCombination[] = [
     guides: ['abyss'],
     type: 'single',
     coreTraits: ['孤独的思想家', '在深处找到光', '沉默中的力量'],
-    description: '你的灵魂沉入了最深的海底，在那里你找到了别人看不到的宝藏——知识、洞察、和对真相的执着。你不需要人群的喧嚣来证明自己，因为你的内心世界比任何人都辽阔。',
+    description: '你的人格沉入了最深的海底，在那里你找到了别人看不到的宝藏——知识、洞察、和对真相的执着。你不需要人群的喧嚣来证明自己，因为你的内心世界比任何人都辽阔。',
     mbtiNote: '常见于 INTJ、INTP、ISTJ 类型',
   },
   {
@@ -89,7 +89,7 @@ export const guideCombinations: GuideCombination[] = [
     guides: ['forest'],
     type: 'single',
     coreTraits: ['天生的共情者', '与世界同呼吸', '温柔的守护力量'],
-    description: '你的灵魂像一棵深深扎根大地的古树，枝叶伸向天空，根系连接着每一个生命。你天生就能感受到他人的喜怒哀乐，并用你温暖的存在治愈着周围的世界。',
+    description: '你的人格像一棵深深扎根大地的古树，枝叶伸向天空，根系连接着每一个生命。你天生就能感受到他人的喜怒哀乐，并用你温暖的存在治愈着周围的世界。',
     mbtiNote: '常见于 ISFJ、ENFJ、INFJ 类型',
   },
   {
@@ -97,8 +97,8 @@ export const guideCombinations: GuideCombination[] = [
     name: '星尘旅人',
     guides: ['star'],
     type: 'single',
-    coreTraits: ['不被定义的自由灵魂', '永远好奇', '灵感如星河'],
-    description: '你的灵魂像一颗划过天际的流星——不被任何轨道束缚，永远追随内心的闪光。你的想象力是你最大的武器，每一天的你都是一个全新的自己，永远在路上。',
+    coreTraits: ['不被定义的自由人格', '永远好奇', '灵感如星河'],
+    description: '你的人格像一颗划过天际的流星——不被任何轨道束缚，永远追随内心的闪光。你的想象力是你最大的武器，每一天的你都是一个全新的自己，永远在路上。',
     mbtiNote: '常见于 ENFP、ENTP、INFP 类型',
   },
 
@@ -109,7 +109,7 @@ export const guideCombinations: GuideCombination[] = [
     guides: ['flame', 'abyss'],
     type: 'dual',
     coreTraits: ['外热内冷', '表面果断内心深邃', '行动与思辨的平衡'],
-    description: '你的灵魂同时拥有火焰的热力和深水的沉静。在外人看来你果断而充满行动力，但只有你自己知道，每一个决定的背后都经过了深层的思考。这种"知行合一"的特质让你成为天生的领导者。',
+    description: '你的人格同时拥有火焰的热力和深水的沉静。在外人看来你果断而充满行动力，但只有你自己知道，每一个决定的背后都经过了深层的思考。这种"知行合一"的特质让你成为天生的领导者。',
     mbtiNote: '行动力与审慎的完美平衡',
   },
   {
@@ -118,7 +118,7 @@ export const guideCombinations: GuideCombination[] = [
     guides: ['flame', 'forest'],
     type: 'dual',
     coreTraits: ['热情且温暖', '强烈的保护欲', '冲劲与温柔并存'],
-    description: '你的灵魂像一团温暖的篝火——既有照亮黑暗的勇气，也有温暖旅人的温柔。你会为了守护在乎的人而毫不犹豫地冲向前方，这份热血与柔情的结合是你最迷人的地方。',
+    description: '你的人格像一团温暖的篝火——既有照亮黑暗的勇气，也有温暖旅人的温柔。你会为了守护在乎的人而毫不犹豫地冲向前方，这份热血与柔情的结合是你最迷人的地方。',
     mbtiNote: '冲劲与温柔的交织',
   },
   {
@@ -127,7 +127,7 @@ export const guideCombinations: GuideCombination[] = [
     guides: ['flame', 'star'],
     type: 'dual',
     coreTraits: ['最强的能量组合', '永不停歇', '灵感驱动的行动者'],
-    description: '你的灵魂像一场壮观的流星雨——每一颗流星都带着火焰和灵感划过天际。你是那种会突然半夜想到一个绝妙点子、然后第二天就真的去做的人。你的存在本身就是一场精彩的冒险。',
+    description: '你的人格像一场壮观的流星雨——每一颗流星都带着火焰和灵感划过天际。你是那种会突然半夜想到一个绝妙点子、然后第二天就真的去做的人。你的存在本身就是一场精彩的冒险。',
     mbtiNote: '专注与发散的华丽碰撞',
   },
   {
@@ -136,7 +136,7 @@ export const guideCombinations: GuideCombination[] = [
     guides: ['abyss', 'forest'],
     type: 'dual',
     coreTraits: ['安静而有深度', '用思考守护温柔', '内在的宁静力量'],
-    description: '你的灵魂像一片幽深的森林，清泉在林间静静流淌。你用深沉的思考来理解世界，用温柔的共情来连接他人。你不急于表达，但当你开口时，每一句话都直抵人心。',
+    description: '你的人格像一片幽深的森林，清泉在林间静静流淌。你用深沉的思考来理解世界，用温柔的共情来连接他人。你不急于表达，但当你开口时，每一句话都直抵人心。',
     mbtiNote: '理智与情感的和谐融合',
   },
   {
@@ -145,7 +145,7 @@ export const guideCombinations: GuideCombination[] = [
     guides: ['abyss', 'star'],
     type: 'dual',
     coreTraits: ['理性深处的天马行空', '逻辑与直觉的舞蹈', '思想先锋'],
-    description: '你的灵魂是一片深邃的海洋，水面上映照着变幻的极光。你拥有罕见的"深度+广度"组合——既能在一个问题上深入到底，又能跳出框架看到全新的可能。你是思想的探险家。',
+    description: '你的人格是一片深邃的海洋，水面上映照着变幻的极光。你拥有罕见的"深度+广度"组合——既能在一个问题上深入到底，又能跳出框架看到全新的可能。你是思想的探险家。',
     mbtiNote: '逻辑与直觉的舞蹈',
   },
   {
@@ -154,7 +154,7 @@ export const guideCombinations: GuideCombination[] = [
     guides: ['forest', 'star'],
     type: 'dual',
     coreTraits: ['创造力与共情力', '理想主义的建设者', '用灵感治愈世界'],
-    description: '你的灵魂是一座永远盛放的花园——每一朵花都是一个灵感，每一片叶子都承载着一份关怀。你用创造力来表达你对世界的爱，你的作品和想法总是能让人们看到更美好的一面。',
+    description: '你的人格是一座永远盛放的花园——每一朵花都是一个灵感，每一片叶子都承载着一份关怀。你用创造力来表达你对世界的爱，你的作品和想法总是能让人们看到更美好的一面。',
     mbtiNote: '理想与现实的诗意桥梁',
   },
 
@@ -165,7 +165,7 @@ export const guideCombinations: GuideCombination[] = [
     guides: ['flame', 'abyss', 'forest'],
     type: 'triple',
     coreTraits: ['兼具行动、深度和温暖', '全能守护者', '三重力量平衡'],
-    description: '你的灵魂像一座矗立的大山——有烈焰之灵的坚定行动力，有深渊之灵的深层智慧，还有森林之灵的温暖关怀。你是一个罕见的全方位灵魂，能从多个维度理解和回应这个世界。',
+    description: '你的人格像一座矗立的大山——有烈焰之灵的坚定行动力，有深渊之灵的深层智慧，还有森林之灵的温暖关怀。你是一个罕见的全方位人格，能从多个维度理解和回应这个世界。',
     mbtiNote: '三种力量的完美平衡',
   },
   {
@@ -174,7 +174,7 @@ export const guideCombinations: GuideCombination[] = [
     guides: ['flame', 'abyss', 'star'],
     type: 'triple',
     coreTraits: ['混乱中保持冷静', '主动制造变革', '战略型创新者'],
-    description: '你的灵魂像一场风暴的中心——外界狂风暴雨，你的内心却异常平静和清醒。你有着在混乱中做出精确判断的天赋，同时又不断用新的想法和勇气去改变现状。你是变革的催化剂。',
+    description: '你的人格像一场风暴的中心——外界狂风暴雨，你的内心却异常平静和清醒。你有着在混乱中做出精确判断的天赋，同时又不断用新的想法和勇气去改变现状。你是变革的催化剂。',
     mbtiNote: '冷静与激情的独特共存',
   },
   {
@@ -183,7 +183,7 @@ export const guideCombinations: GuideCombination[] = [
     guides: ['flame', 'forest', 'star'],
     type: 'triple',
     coreTraits: ['充满能量的感染型人格', '照亮周围的人', '温暖而有创造力'],
-    description: '你的灵魂像一朵向日葵——永远面向光明，并把温暖传递给每一个人。你的热情、关怀和创造力让你成为天然的"能量源"，人们在你身边总会感到振奋和充满希望。',
+    description: '你的人格像一朵向日葵——永远面向光明，并把温暖传递给每一个人。你的热情、关怀和创造力让你成为天然的"能量源"，人们在你身边总会感到振奋和充满希望。',
     mbtiNote: '能量与温暖的三重奏',
   },
   {
@@ -192,7 +192,7 @@ export const guideCombinations: GuideCombination[] = [
     guides: ['abyss', 'forest', 'star'],
     type: 'triple',
     coreTraits: ['深层理解与创造力', '折射世界的多面性', '安静的灵感者'],
-    description: '你的灵魂像一面月光下的棱镜——看似安静，内在却折射出七彩的光芒。你用深层的理解力去感知世界，用同理心去连接他人，用创造力去表达那些无法用言语描述的感悟。',
+    description: '你的人格像一面月光下的棱镜——看似安静，内在却折射出七彩的光芒。你用深层的理解力去感知世界，用同理心去连接他人，用创造力去表达那些无法用言语描述的感悟。',
     mbtiNote: '深度与广度的内在统一',
   },
 
@@ -202,8 +202,8 @@ export const guideCombinations: GuideCombination[] = [
     name: '万象星灵',
     guides: ['flame', 'abyss', 'forest', 'star'],
     type: 'quad',
-    coreTraits: ['极其罕见的全方位灵魂', '四元素和谐统一', '无限可能性'],
-    description: '极其罕见。你的灵魂像一颗同时燃烧着四种元素的恒星——拥有战士的勇气、思想家的深度、治愈者的温柔和艺术家的灵感。这四种力量在你体内和谐共存，让你能够理解和连接几乎任何类型的人。你是一面完整的镜子，映照着灵魂星图的全部光彩。',
+    coreTraits: ['极其罕见的全方位人格', '四元素和谐统一', '无限可能性'],
+    description: '极其罕见。你的人格像一颗同时燃烧着四种元素的恒星——拥有战士的勇气、思想家的深度、治愈者的温柔和艺术家的灵感。这四种力量在你体内和谐共存，让你能够理解和连接几乎任何类型的人。你是一面完整的镜子，映照着人格星图的全部光彩。',
     mbtiNote: '全国仅约 3-5% 的人拥有此组合',
   },
 ]

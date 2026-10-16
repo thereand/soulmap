@@ -1,5 +1,5 @@
 <!--
-  灵魂星图 - 免费结果页
+  人格星图 - 免费结果页
   付费转化的关键页面：揭晓动画 → 星灵卡片 → 核心标签 → 雷达图 → 免费摘要 → 付费墙
 -->
 <template>
@@ -203,8 +203,8 @@
         <!-- 对比入口 -->
         <view class="compare-entry" @tap="goToCompare">
           <view class="compare-entry__left">
-            <text class="compare-entry__title">💫 灵魂契合度</text>
-            <text class="compare-entry__desc">邀请好友测试，对比你们的灵魂匹配度</text>
+            <text class="compare-entry__title">💫 人格契合度</text>
+            <text class="compare-entry__desc">邀请好友测试，对比你们的人格匹配度</text>
           </view>
           <text class="compare-entry__arrow">→</text>
         </view>
@@ -238,6 +238,11 @@
         <text class="footer-note">
           {{ showPaywallSection ? '众多同类型星灵已解锁深度解读，你也可以' : '当前版本所有深度解读均可免费查看' }}
         </text>
+      </view>
+
+      <!-- 合规免责声明 -->
+      <view class="result-legal">
+        <text class="result-legal__text">本应用为趣味人格探索工具，不涉及占卜、算命、运势预测等内容，结果仅供娱乐参考。</text>
       </view>
 
       <!-- 底部安全距离 -->
@@ -644,7 +649,7 @@ onShareAppMessage(() => {
     resultType: testStore.result?.personalityType || '',
   })
   return {
-    title: `我的灵魂星灵是「${name}」，来测测你的！`,
+    title: `我的人格星灵是「${name}」，来测测你的！`,
     path: `/pages/index/index?inviteCode=${code}`,
   }
 })
@@ -1149,6 +1154,22 @@ function goToAtlas() {
   font-size: $font-xs;
   color: $text-muted;
   text-align: center;
+}
+
+/* ===== 合规免责声明 ===== */
+.result-legal {
+  width: 100%;
+  max-width: 640rpx;
+  margin: 32rpx auto 16rpx;
+  padding: 0 32rpx;
+  text-align: center;
+
+  &__text {
+    font-size: 22rpx;
+    color: rgba(255, 255, 255, 0.35);
+    line-height: 1.6;
+    letter-spacing: 1rpx;
+  }
 }
 
 .safe-bottom {

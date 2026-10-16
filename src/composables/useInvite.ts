@@ -1,5 +1,5 @@
 /**
- * 灵魂星图 - 分享裂变组合式函数
+ * 人格星图 - 分享裂变组合式函数
  *
  * 提供：
  *  - 生成 / 读取当前用户的邀请码（openid 短哈希）
@@ -16,7 +16,7 @@ import { track, AnalyticsEvent } from '@/utils/analytics'
 export const REWARD_TIERS = [
   { count: 1, key: 'social_style', label: '解锁「社交风格」维度解析' },
   { count: 3, key: 'full_free_report', label: '解锁完整免费报告（¥9.9）' },
-  { count: 5, key: 'compare_ticket', label: '获得 1 次「灵魂契合度」对比' },
+  { count: 5, key: 'compare_ticket', label: '获得 1 次「人格契合度」对比' },
 ] as const
 
 const STORAGE_INVITE_CODE = 'SOULMAP_INVITE_CODE_MINE'
@@ -186,7 +186,7 @@ export function useInvite() {
   function buildSharePayload(personalityName: string) {
     const code = myInviteCode.value || generateLocalInviteCode()
     return {
-      title: `我的灵魂星灵是「${personalityName}」，来测测你的！`,
+      title: `我的人格星灵是「${personalityName}」，来测测你的！`,
       path: `/pages/index/index?inviteCode=${code}`,
       /** H5 链接 */
       h5Link: `https://soulmap.app/#/?invite=${code}`,

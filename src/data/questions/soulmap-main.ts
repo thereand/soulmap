@@ -1,7 +1,7 @@
 import type { TestQuestion } from '@/types/test'
 
 /**
- * 灵魂星图 — 25道沉浸式剧情化测试题目
+ * 人格星图 — 25道沉浸式剧情化测试题目
  * 分5章，每章5题，基于MBTI四维度
  */
 export const soulmapMainQuestions: TestQuestion[] = [
@@ -44,7 +44,7 @@ export const soulmapMainQuestions: TestQuestion[] = [
     chapterId: 'ch1',
     order: 3,
     type: 'single',
-    text: '守星者摘下面具，露出苍老而温和的面孔。他递来一块水晶碎片："这是灵魂碎片的第一块，握住它，你会看到内心最深处的倒影。"水晶在掌心发光，浮现出一段模糊的童年记忆。',
+    text: '守星者摘下面具，露出苍老而温和的面孔。他递来一块水晶碎片："这是人格碎片的第一块，握住它，你会看到内心最深处的倒影。"水晶在掌心发光，浮现出一段模糊的童年记忆。',
     image: 'chapter1_bg',
     estimatedTime: 25,
     options: [
@@ -73,13 +73,13 @@ export const soulmapMainQuestions: TestQuestion[] = [
     chapterId: 'ch1',
     order: 5,
     type: 'single',
-    text: '裂缝深处传来低沉吟唱，一本厚重古籍从地下浮起，自动翻开到某一页。金色文字写道："觉醒者，你即将踏上灵魂星图的旅程。出发前，请选择你最想带走的东西。"书页上浮现三件物品的幻象。',
+    text: '裂缝深处传来低沉吟唱，一本厚重古籍从地下浮起，自动翻开到某一页。金色文字写道："觉醒者，你即将踏上人格星图的旅程。出发前，请选择你最想带走的东西。"书页上浮现三件物品的幻象。',
     image: 'chapter1_bg',
     estimatedTime: 25,
     options: [
       { id: 'q5a', text: '一面能映照真实的镜子——看清世界本来的样子', weights: { EI: 0, SN: 2, TF: 1, JP: 0 }, guides: { flame: 1, abyss: 1, forest: 0, star: 0 } },
       { id: 'q5b', text: '一颗能感知万物的水晶球——洞悉表象之下的秘密', weights: { EI: 0, SN: -2, TF: -1, JP: 0 }, guides: { flame: -1, abyss: 2, forest: 0, star: 2 } },
-      { id: 'q5c', text: '一本记载所有答案的书——掌握知识就是掌握命运', weights: { EI: -1, SN: 0, TF: 2, JP: 1 }, guides: { flame: 0, abyss: 3, forest: -1, star: 0 } },
+      { id: 'q5c', text: '一本记载所有答案的书——掌握知识就是掌握前路', weights: { EI: -1, SN: 0, TF: 2, JP: 1 }, guides: { flame: 0, abyss: 3, forest: -1, star: 0 } },
     ],
   },
 
@@ -171,12 +171,12 @@ export const soulmapMainQuestions: TestQuestion[] = [
     chapterId: 'ch3',
     order: 1,
     type: 'single',
-    text: '极光消散后，你被传送到一片黑暗森林。前方传来求救声——一位年轻药师被荆棘缠住。她身旁篮子里装满罕见的灵魂草药，正是修复碎片所需的关键材料。先救她，草药可能被荆棘吞噬；先抢收草药，她可能伤得更重。',
+    text: '极光消散后，你被传送到一片黑暗森林。前方传来求救声——一位年轻药师被荆棘缠住。她身旁篮子里装满罕见的人格草药，正是修复碎片所需的关键材料。先救她，草药可能被荆棘吞噬；先抢收草药，她可能伤得更重。',
     image: 'chapter3_bg',
     estimatedTime: 30,
     options: [
       { id: 'q11a', text: '先救药师——人的安危永远比物品重要', weights: { EI: 1, SN: 0, TF: -2, JP: 0 }, guides: { flame: 0, abyss: -1, forest: 3, star: 0 } },
-      { id: 'q11b', text: '先收草药——这些草药能拯救更多人的灵魂碎片，理性来看应该优先保全', weights: { EI: 0, SN: 1, TF: 2, JP: 1 }, guides: { flame: 1, abyss: 2, forest: -1, star: -1 } },
+      { id: 'q11b', text: '先收草药——这些草药能拯救更多人的人格碎片，理性来看应该优先保全', weights: { EI: 0, SN: 1, TF: 2, JP: 1 }, guides: { flame: 1, abyss: 2, forest: -1, star: -1 } },
       { id: 'q11c', text: '想办法同时解决——仔细观察荆棘的生长规律，寻找两全之策', weights: { EI: -1, SN: 1, TF: 0, JP: -1 }, guides: { flame: 0, abyss: 2, forest: 0, star: 1 } },
     ],
   },
@@ -186,12 +186,12 @@ export const soulmapMainQuestions: TestQuestion[] = [
     chapterId: 'ch3',
     order: 2,
     type: 'single',
-    text: '药师带你来到她的村庄。守护灵兽病了，唯一治愈方法需要用到你背包里的一块灵魂碎片——失去它意味着你的灵魂星图永远不完整。村长跪在你面前，身后是几十双期盼的眼睛。',
+    text: '药师带你来到她的村庄。守护灵兽病了，唯一治愈方法需要用到你背包里的一块人格碎片——失去它意味着你的人格星图永远不完整。村长跪在你面前，身后是几十双期盼的眼睛。',
     image: 'chapter3_bg',
     estimatedTime: 30,
     options: [
       { id: 'q12a', text: '交出碎片——这些人的生命比你的完整旅程更重要', weights: { EI: 1, SN: 0, TF: -2, JP: 0 }, guides: { flame: 0, abyss: -1, forest: 3, star: 0 } },
-      { id: 'q12b', text: '拒绝交出——你的旅程关乎更多人的命运，不能因小失大', weights: { EI: 0, SN: 0, TF: 2, JP: 1 }, guides: { flame: 1, abyss: 2, forest: -1, star: 0 } },
+      { id: 'q12b', text: '拒绝交出——你的旅程关乎更多人的前路，不能因小失大', weights: { EI: 0, SN: 0, TF: 2, JP: 1 }, guides: { flame: 1, abyss: 2, forest: -1, star: 0 } },
       { id: 'q12c', text: '提出条件——你愿意帮助，但村庄必须用其他方式回报你', weights: { EI: 0, SN: 1, TF: 1, JP: 1 }, guides: { flame: 1, abyss: 1, forest: 0, star: 0 } },
     ],
   },
@@ -215,7 +215,7 @@ export const soulmapMainQuestions: TestQuestion[] = [
     chapterId: 'ch3',
     order: 4,
     type: 'single',
-    text: '你救出了竞争对手。他感激地递来"灵魂审判者"的邀请函："明晚月圆，审判之塔将开启，你将面对一场关于正义的考验。"翌日塔内，天平一端放着跳动的心脏，另一端是厚重法典。审判者问道："旅人，什么才是正义的根基？"',
+    text: '你救出了竞争对手。他感激地递来"人格审判者"的邀请函："明晚月圆，审判之塔将开启，你将面对一场关于正义的考验。"翌日塔内，天平一端放着跳动的心脏，另一端是厚重法典。审判者问道："旅人，什么才是正义的根基？"',
     image: 'chapter3_bg',
     estimatedTime: 30,
     options: [
@@ -230,7 +230,7 @@ export const soulmapMainQuestions: TestQuestion[] = [
     chapterId: 'ch3',
     order: 5,
     type: 'single',
-    text: '审判者点头，审判之塔开始崩解。废墟中你发现一颗散发温暖光芒的灵魂碎片，但碎片旁蜷缩着一个哭泣的孩子——她也是旅人，迷路已久，非常害怕。碎片的光芒正在减弱，片刻后就会消失。',
+    text: '审判者点头，审判之塔开始崩解。废墟中你发现一颗散发温暖光芒的人格碎片，但碎片旁蜷缩着一个哭泣的孩子——她也是旅人，迷路已久，非常害怕。碎片的光芒正在减弱，片刻后就会消失。',
     image: 'chapter3_bg',
     estimatedTime: 25,
     options: [
@@ -263,7 +263,7 @@ export const soulmapMainQuestions: TestQuestion[] = [
     chapterId: 'ch4',
     order: 2,
     type: 'single',
-    text: '暗潮中，你获得一件"灵魂武装"——它会根据你的内心变化。意志坚定如铁，它变成坚不可摧的盾牌；心灵灵活如水，它变成斩断幻象的长剑。但你只有三分钟决定它的形态，暗潮不会等你。',
+    text: '暗潮中，你获得一件"人格武装"——它会根据你的内心变化。意志坚定如铁，它变成坚不可摧的盾牌；心灵灵活如水，它变成斩断幻象的长剑。但你只有三分钟决定它的形态，暗潮不会等你。',
     image: 'chapter4_bg',
     estimatedTime: 25,
     options: [
@@ -293,7 +293,7 @@ export const soulmapMainQuestions: TestQuestion[] = [
     chapterId: 'ch4',
     order: 4,
     type: 'single',
-    text: '你遇到"星尘行者"——一位独自旅行很久的旅人，收集了比你更多的灵魂碎片。她提议结盟，条件是你必须按她精心制定的计划行动，不能擅自改变路线。计划看起来很周密，但你总觉得少了些什么。',
+    text: '你遇到"星尘行者"——一位独自旅行很久的旅人，收集了比你更多的人格碎片。她提议结盟，条件是你必须按她精心制定的计划行动，不能擅自改变路线。计划看起来很周密，但你总觉得少了些什么。',
     image: 'chapter4_bg',
     estimatedTime: 25,
     options: [
@@ -308,12 +308,12 @@ export const soulmapMainQuestions: TestQuestion[] = [
     chapterId: 'ch4',
     order: 5,
     type: 'single',
-    text: '前方出现"试炼之桥"，桥面由浮动光块组成，没有固定路径，桥的另一端是灵魂圣殿入口。旁边石碑刻着两种过桥方式：按光块闪烁的规律一步步踏过去，需要耐心和观察；纵身跃入光块间的空隙，让灵魂力量托举你飞过，需要勇气和信任。',
+    text: '前方出现"试炼之桥"，桥面由浮动光块组成，没有固定路径，桥的另一端是人格圣殿入口。旁边石碑刻着两种过桥方式：按光块闪烁的规律一步步踏过去，需要耐心和观察；纵身跃入光块间的空隙，让人格力量托举你飞过，需要勇气和信任。',
     image: 'chapter4_bg',
     estimatedTime: 25,
     options: [
       { id: 'q20a', text: '研究光块的规律，按部就班地稳步通过', weights: { EI: -1, SN: 2, TF: 1, JP: 2 }, guides: { flame: 0, abyss: 2, forest: -1, star: -1 } },
-      { id: 'q20b', text: '纵身跃入空隙——相信自己的直觉和灵魂力量', weights: { EI: 1, SN: -2, TF: -1, JP: -2 }, guides: { flame: 2, abyss: 0, forest: 0, star: 2 } },
+      { id: 'q20b', text: '纵身跃入空隙——相信自己的直觉和人格力量', weights: { EI: 1, SN: -2, TF: -1, JP: -2 }, guides: { flame: 2, abyss: 0, forest: 0, star: 2 } },
     ],
   },
 
@@ -326,7 +326,7 @@ export const soulmapMainQuestions: TestQuestion[] = [
     chapterId: 'ch5',
     order: 1,
     type: 'single',
-    text: '灵魂圣殿大门打开，里面是一片无垠的空白空间。守护者声如钟鸣："旅人，你已走过觉醒、探索、抉择与蜕变。现在用灵魂碎片构建属于你的世界——首先，你希望这个世界有多大？"',
+    text: '人格圣殿大门打开，里面是一片无垠的空白空间。守护者声如钟鸣："旅人，你已走过觉醒、探索、抉择与蜕变。现在用人格碎片构建属于你的世界——首先，你希望这个世界有多大？"',
     image: 'chapter5_bg',
     estimatedTime: 30,
     options: [
@@ -356,7 +356,7 @@ export const soulmapMainQuestions: TestQuestion[] = [
     chapterId: 'ch5',
     order: 3,
     type: 'single',
-    text: '世界初具雏形，还缺少"居民"。你可以从灵魂碎片中召唤三种存在：守序者建立规则维护秩序，梦想家创造艺术传播灵感，旅行者不断探索带回新故事。守护者问："你希望谁是最重要的存在？"',
+    text: '世界初具雏形，还缺少"居民"。你可以从人格碎片中召唤三种存在：守序者建立规则维护秩序，梦想家创造艺术传播灵感，旅行者不断探索带回新故事。守护者问："你希望谁是最重要的存在？"',
     image: 'chapter5_bg',
     estimatedTime: 25,
     options: [

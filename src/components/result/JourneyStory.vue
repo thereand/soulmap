@@ -1,6 +1,6 @@
 <!--
-  灵魂星图 - 灵魂旅程叙事卡片组件
-  以古卷轴 / 故事书的视觉风格展示用户的个性化灵魂旅程。
+  人格星图 - 人格旅程叙事卡片组件
+  以古卷轴 / 故事书的视觉风格展示用户的个性化人格旅程。
   段落按 \n\n 分隔，逐段淡入，首字金色大写装饰。
 -->
 <template>
@@ -11,7 +11,7 @@
     <!-- ── 标题区域 ── -->
     <view class="journey-story__title-row">
       <view class="journey-story__ornament journey-story__ornament--left" />
-      <text class="journey-story__title">你的灵魂旅程</text>
+      <text class="journey-story__title">你的人格旅程</text>
       <view class="journey-story__ornament journey-story__ornament--right" />
     </view>
 
@@ -49,7 +49,7 @@
 import { computed } from 'vue'
 
 interface Props {
-  /** 组装好的灵魂旅程叙事文本（段落之间以 \n\n 分隔） */
+  /** 组装好的人格旅程叙事文本（段落之间以 \n\n 分隔） */
   story: string
 }
 

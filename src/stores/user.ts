@@ -1,5 +1,5 @@
 /**
- * 灵魂星图 - 用户状态 Store
+ * 人格星图 - 用户状态 Store
  * 管理用户登录、会员信息、测试历史等
  */
 import { defineStore } from 'pinia'

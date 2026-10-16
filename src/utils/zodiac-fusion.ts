@@ -1,5 +1,5 @@
 /**
- * 灵魂星图 — 星座×MBTI 融合解读工具
+ * 人格星图 — 星座×MBTI 融合解读工具
  *
  * 根据用户的星座与 MBTI 类型，生成个性化的融合解读，
  * 包括共鸣/反差/互补模式判断、解读文本、星座加成特质和隐藏面。
@@ -219,7 +219,7 @@ export function getZodiacInterpretation(
   const textIndex = texts.length > 0
     ? mbtiType.split('').reduce((sum, c) => sum + c.charCodeAt(0), 0) % texts.length
     : 0
-  const text = texts[textIndex] ?? `你的${zodiacId}星座与${mbtiType}型人格形成了独特的共鸣模式，这让你的灵魂图谱别具一格。`
+  const text = texts[textIndex] ?? `你的${zodiacId}星座与${mbtiType}型人格形成了独特的共鸣模式，这让你的人格图谱别具一格。`
 
   // 匹配度分数：根据模式给予合理范围
   const baseScores: Record<ZodiacInterpretationMode, [number, number]> = {

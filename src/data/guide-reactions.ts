@@ -1,7 +1,7 @@
 import type { GuideReactionData } from '@/types/guide'
 
 /**
- * 灵魂星图 — 向导即时反应
+ * 人格星图 — 向导即时反应
  *
  * 每道题回答后显示的向导短评，根据当前主导向导展示。
  * 共 144 条（36 题 × 4 向导）。
@@ -64,17 +64,17 @@ export const guideReactions: GuideReactionData[] = [
 
   // ── q10：理想之城的蓝图（效率 vs 交流 vs 探索）──
   { questionId: 'q10', guideId: 'flame', text: '高效的才是最强的！' },
-  { questionId: 'q10', guideId: 'abyss', text: '一座城市的面貌，映射居民的灵魂……' },
+  { questionId: 'q10', guideId: 'abyss', text: '一座城市的面貌，映射居民的人格……' },
   { questionId: 'q10', guideId: 'forest', text: '有花园和笑声的城市最美好。' },
   { questionId: 'q10', guideId: 'star', text: '充满秘密的城市！永远有惊喜！' },
 
   // ── q11：救人还是救草药（人命 vs 大局 vs 两全）──
   { questionId: 'q11', guideId: 'flame', text: '别想了，先冲上去救人！' },
-  { questionId: 'q11', guideId: 'abyss', text: '两难之间……才是灵魂被考验的地方。' },
+  { questionId: 'q11', guideId: 'abyss', text: '两难之间……才是人格被考验的地方。' },
   { questionId: 'q11', guideId: 'forest', text: '救人要紧！什么都比不上生命。' },
   { questionId: 'q11', guideId: 'star', text: '一定有办法两个都救到的！' },
 
-  // ── q12：交出灵魂碎片救灵兽（牺牲 vs 拒绝 vs 条件交换）──
+  // ── q12：交出人格碎片救灵兽（牺牲 vs 拒绝 vs 条件交换）──
   { questionId: 'q12', guideId: 'flame', text: '该出手时就出手！' },
   { questionId: 'q12', guideId: 'abyss', text: '每一份牺牲都有重量……值得深思。' },
   { questionId: 'q12', guideId: 'forest', text: '愿意为别人付出，很了不起……' },
@@ -104,7 +104,7 @@ export const guideReactions: GuideReactionData[] = [
   { questionId: 'q16', guideId: 'forest', text: '和大家在一起，更安全也更温暖。' },
   { questionId: 'q16', guideId: 'star', text: '山洞里说不定藏着超酷的秘密！' },
 
-  // ── q17：灵魂武装形态（盾牌 vs 长剑 vs 观察后决定）──
+  // ── q17：人格武装形态（盾牌 vs 长剑 vs 观察后决定）──
   { questionId: 'q17', guideId: 'flame', text: '进攻才是最好的防守！冲！' },
   { questionId: 'q17', guideId: 'abyss', text: '盾与剑……防守与进攻，哪个更接近你？' },
   { questionId: 'q17', guideId: 'forest', text: '保护好身边的人，比什么都重要。' },
@@ -126,7 +126,7 @@ export const guideReactions: GuideReactionData[] = [
   { questionId: 'q20', guideId: 'flame', text: '跳！别犹豫，纵身一跃！' },
   { questionId: 'q20', guideId: 'abyss', text: '稳与险……都是过桥的方式。' },
   { questionId: 'q20', guideId: 'forest', text: '一步一步走，稳稳的也很好。' },
-  { questionId: 'q20', guideId: 'star', text: '飞过去多帅！灵魂力量托着你！' },
+  { questionId: 'q20', guideId: 'star', text: '飞过去多帅！人格力量托着你！' },
 
   // ── q21：构建世界的大小（精致小世界 vs 无限大世界 vs 活世界）──
   { questionId: 'q21', guideId: 'flame', text: '要大！越大越有挑战！' },
@@ -142,7 +142,7 @@ export const guideReactions: GuideReactionData[] = [
 
   // ── q23：召唤居民（守序者 vs 梦想家 vs 旅行者）──
   { questionId: 'q23', guideId: 'flame', text: '守序者！让世界高效运转！' },
-  { questionId: 'q23', guideId: 'abyss', text: '梦想家……让世界有深度和灵魂。' },
+  { questionId: 'q23', guideId: 'abyss', text: '梦想家……让世界有深度和人格。' },
   { questionId: 'q23', guideId: 'forest', text: '旅行者带回来的故事最珍贵了。' },
   { questionId: 'q23', guideId: 'star', text: '全都召唤！越热闹越好玩！' },
 
@@ -164,7 +164,7 @@ export const guideReactions: GuideReactionData[] = [
 
   // ── q26：面对终极试炼的心态 ──
   { questionId: 'q26', guideId: 'flame', text: '来吧！最强的对手就是自己！' },
-  { questionId: 'q26', guideId: 'abyss', text: '试炼……不过是灵魂的又一次呼吸。' },
+  { questionId: 'q26', guideId: 'abyss', text: '试炼……不过是人格的又一次呼吸。' },
   { questionId: 'q26', guideId: 'forest', text: '不管结果怎样，你已经很棒了。' },
   { questionId: 'q26', guideId: 'star', text: '终极挑战？超级期待！' },
 
@@ -210,7 +210,7 @@ export const guideReactions: GuideReactionData[] = [
   { questionId: 'q33', guideId: 'forest', text: '害怕也没关系，记住被爱的感觉就好。' },
   { questionId: 'q33', guideId: 'star', text: '把恐惧变成冒险！就不怕了！' },
 
-  // ── q34：灵魂最看重的东西 ──
+  // ── q34：人格最看重的东西 ──
   { questionId: 'q34', guideId: 'flame', text: '力量！守护一切的力量！' },
   { questionId: 'q34', guideId: 'abyss', text: '智慧……理解一切的智慧。' },
   { questionId: 'q34', guideId: 'forest', text: '爱……连接一切的爱。' },
@@ -222,9 +222,9 @@ export const guideReactions: GuideReactionData[] = [
   { questionId: 'q35', guideId: 'forest', text: '慢一点也没关系，一步一步来。' },
   { questionId: 'q35', guideId: 'star', text: '换个角度看，也许完全不同！' },
 
-  // ── q36：试炼结束，灵魂觉醒 ──
+  // ── q36：试炼结束，人格觉醒 ──
   { questionId: 'q36', guideId: 'flame', text: '这不是终点——是新的起点！' },
   { questionId: 'q36', guideId: 'abyss', text: '终点与起点……不过是同一枚硬币的两面。' },
-  { questionId: 'q36', guideId: 'forest', text: '辛苦了……你的灵魂真的很美。' },
+  { questionId: 'q36', guideId: 'forest', text: '辛苦了……你的人格真的很美。' },
   { questionId: 'q36', guideId: 'star', text: '太精彩了！下一次冒险什么时候开始？' },
 ]

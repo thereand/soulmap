@@ -1,5 +1,5 @@
 /**
- * 灵魂星图 - 分享海报 Canvas 绘制工具
+ * 人格星图 - 分享海报 Canvas 绘制工具
  *
  * 在 750×1334 的 Canvas 上绘制深色星空主题分享海报：
  * - 顶部 40%：星空背景 + 发光光球（代表色渐变）
@@ -307,7 +307,7 @@ function drawFooter(
   // 副文案
   ctx.fillStyle = 'rgba(255,255,255,0.5)'
   ctx.font = '20px sans-serif'
-  ctx.fillText('看看你和 TA 是什么灵魂关系', width / 2, centerY + 42)
+  ctx.fillText('看看你和 TA 是什么人格关系', width / 2, centerY + 42)
 
   // 小程序码占位（白色圆角方形）
   const qrSize = 100

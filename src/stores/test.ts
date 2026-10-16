@@ -1,5 +1,5 @@
 /**
- * 灵魂星图 - 测试状态 Store（Pinia）
+ * 人格星图 - 测试状态 Store（Pinia）
  *
  * 管理全局测试会话状态，与 useTestEngine 组合式函数配合使用：
  * - Store 负责全局持久化状态（会话、模式、结果）
@@ -58,7 +58,7 @@ export const useTestStore = defineStore('test', () => {
   /** 测试结果（提交后） */
   const result = ref<TestResult | null>(null)
 
-  /** 选择的灵魂向导 ID（旧版保留兼容） */
+  /** 选择的人格向导 ID（旧版保留兼容） */
   const selectedGuide = ref<string | null>(null)
 
   /** 用户选择的星座 ID */
@@ -436,7 +436,7 @@ export const useTestStore = defineStore('test', () => {
   }
 
   /**
-   * 设置灵魂向导
+   * 设置人格向导
    */
   function setSelectedGuide(guideId: string | null): void {
     selectedGuide.value = guideId

@@ -1,5 +1,5 @@
 <!--
-  灵魂星图 - 灵魂启程页
+  人格星图 - 人格启程页
   序章动画 → 星座选择 → 开启旅程
 -->
 <template>
@@ -28,7 +28,7 @@
       <!-- 顶部引导文案 -->
       <view class="guide-section">
         <text class="guide-icon">✦</text>
-        <text class="guide-title">灵魂星图已为你展开</text>
+        <text class="guide-title">人格星图已为你展开</text>
         <text class="guide-desc">
           四位星灵正在星图深处等待觉醒...
           <text v-if="selectedZodiacName" class="zodiac-hint">
@@ -63,7 +63,7 @@
         <view class="action-btn action-btn--active" @tap="handleStartJourney">
           <view class="action-btn__glow" />
           <view class="action-btn__inner">
-            <text class="action-btn__text">{{ hasUnfinishedProgress ? '重新开始' : '开启灵魂探索' }}</text>
+            <text class="action-btn__text">{{ hasUnfinishedProgress ? '重新开始' : '开启人格探索' }}</text>
             <text class="action-btn__arrow">→</text>
           </view>
         </view>

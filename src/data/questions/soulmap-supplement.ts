@@ -1,7 +1,7 @@
 import type { TestQuestion } from '@/types/test'
 
 /**
- * 灵魂星图 — 补充题目（每章追加1题，深化人格画像）
+ * 人格星图 — 补充题目（每章追加1题，深化人格画像）
  * 5道补充题目，分别对应第一章至第五章的核心维度
  */
 export const soulmapSupplementQuestions: TestQuestion[] = [
@@ -151,7 +151,7 @@ export const soulmapSupplementQuestions: TestQuestion[] = [
     chapterId: 'ch5',
     order: 7,
     type: 'single',
-    text: '灵魂星图旅程走到尾声。守护者最后一次出现，身后是一扇即将关闭的光之门。"旅人，你只能带走一样东西回到现实世界。"他伸出手，掌心浮现三种光芒：一种凝固成具体的画面，一种化为无法言说的温暖感觉，最后一种变成你旅途中认识的每一张面孔。',
+    text: '人格星图旅程走到尾声。守护者最后一次出现，身后是一扇即将关闭的光之门。"旅人，你只能带走一样东西回到现实世界。"他伸出手，掌心浮现三种光芒：一种凝固成具体的画面，一种化为无法言说的温暖感觉，最后一种变成你旅途中认识的每一张面孔。',
     image: 'chapter5_bg',
     estimatedTime: 25,
     options: [

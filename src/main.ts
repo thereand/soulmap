@@ -1,5 +1,5 @@
 /**
- * 灵魂星图 - 应用入口文件
+ * 人格星图 - 应用入口文件
  * 初始化 Vue 应用并安装 Pinia 状态管理
  */
 import { createSSRApp } from 'vue'

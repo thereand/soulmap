@@ -1,5 +1,5 @@
 <!--
-  灵魂星图 - 答题主页面
+  人格星图 - 答题主页面
   水墨仙侠风格：沉浸式全屏答题体验
 -->
 <template>
@@ -28,7 +28,7 @@
     <view class="status-bar" :style="{ height: statusBarHeight + 'px' }" />
     <view class="page-nav" :style="{ height: navigationHeight + 'px', paddingRight: navigationRightInset + 'px' }">
       <button class="nav-back" aria-label="返回" @tap="handleBack">‹</button>
-      <text class="nav-title">灵魂探索</text>
+      <text class="nav-title">人格探索</text>
       <view class="star-map-wrapper">
         <StarMapIndicator :scores="engine.guideScoring.rawGuideScores.value" compact />
       </view>
@@ -147,7 +147,7 @@
       @complete="handleDialogueComplete"
     />
 
-    <!-- 灵魂共鸣动画 -->
+    <!-- 人格共鸣动画 -->
     <SoulResonance
       :guide-id="engine.resonanceGuide.value || 'flame'"
       :visible="engine.showResonance.value"
@@ -361,7 +361,7 @@ watch(
       // 身份使用 chapterId，显示编号使用配置 order；ch6 实际是第四章。
       const chId = engine.transitionFromChapterId.value || ''
       transitionChapter.value = engine.chaptersList.value.find(chapter => chapter.id === chId)?.order ?? 1
-      transitionFragmentName.value = chapterMeta[chId]?.fragmentName ?? '灵魂碎片'
+      transitionFragmentName.value = chapterMeta[chId]?.fragmentName ?? '人格碎片'
       showTransition.value = true
       isTransitioning.value = true
     }
@@ -534,7 +534,7 @@ function handleDialogueComplete(): void {
   scheduleShowOptions()
 }
 
-/** 灵魂共鸣动画完成 */
+/** 人格共鸣动画完成 */
 function handleResonanceComplete(): void {
   engine.confirmResonance()
 }

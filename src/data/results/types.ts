@@ -1,5 +1,5 @@
 /**
- * 灵魂星图 - 16种星灵人格类型定义
+ * 人格星图 - 16种星灵人格类型定义
  * 每种人格对应 MBTI 的一个类型，使用原创 IP 名称和设定
  */
 
@@ -45,7 +45,7 @@ export const personalityTypes: Record<string, PersonalityTypeData> = {
   INTP: {
     code: 'INTP',
     name: '幻梦织者',
-    title: '用无限好奇解构宇宙规则的灵魂',
+    title: '用无限好奇解构宇宙规则的人格',
     tags: ['思想家', '探索者', '逻辑师'],
     element: '风',
     color: '#7B9ACC',
@@ -71,7 +71,7 @@ export const personalityTypes: Record<string, PersonalityTypeData> = {
   ENTP: {
     code: 'ENTP',
     name: '混沌智者',
-    title: '在混沌中发现规律的灵魂火花',
+    title: '在混沌中发现规律的人格火花',
     tags: ['辩者', '创新者', '冒险家'],
     element: '风',
     color: '#FF6B2B',
@@ -83,12 +83,12 @@ export const personalityTypes: Record<string, PersonalityTypeData> = {
   },
   INFJ: {
     code: 'INFJ',
-    name: '灵光预言者',
-    title: '在寂静中倾听宇宙低语的灵魂',
+    name: '灵光预见者',
+    title: '在寂静中倾听宇宙低语的人格',
     tags: ['洞察者', '理想者', '守护者'],
     element: '光',
     color: '#8B5CF6',
-    constellation: '预言圣殿',
+    constellation: '预见圣殿',
     rarity: 'SSR',
     avatar: '/static/images/spirits/INFJ.jpg',
     compatibleTypes: ['ENFP', 'ENTP'],
@@ -97,7 +97,7 @@ export const personalityTypes: Record<string, PersonalityTypeData> = {
   INFP: {
     code: 'INFP',
     name: '星尘诗人',
-    title: '将星尘化作诗篇的温柔灵魂',
+    title: '将星尘化作诗篇的温柔人格',
     tags: ['梦想家', '治愈者', '浪漫者'],
     element: '水',
     color: '#A78BFA',
@@ -136,7 +136,7 @@ export const personalityTypes: Record<string, PersonalityTypeData> = {
   ISTJ: {
     code: 'ISTJ',
     name: '磐石守卫者',
-    title: '如磐石般坚定守护秩序的灵魂',
+    title: '如磐石般坚定守护秩序的人格',
     tags: ['守序者', '可靠者', '执行者'],
     element: '土',
     color: '#57534E',
@@ -175,7 +175,7 @@ export const personalityTypes: Record<string, PersonalityTypeData> = {
   ESFJ: {
     code: 'ESFJ',
     name: '星光庇护者',
-    title: '散发温暖星光庇护周围一切的灵魂',
+    title: '散发温暖星光庇护周围一切的人格',
     tags: ['关怀者', '和谐者', '社交者'],
     element: '光',
     color: '#F472B6',
@@ -201,7 +201,7 @@ export const personalityTypes: Record<string, PersonalityTypeData> = {
   ISFP: {
     code: 'ISFP',
     name: '林间吟游者',
-    title: '在自然和美中找到灵魂归宿',
+    title: '在自然和美中找到人格归宿',
     tags: ['艺术者', '感性者', '自由者'],
     element: '水',
     color: '#34D399',

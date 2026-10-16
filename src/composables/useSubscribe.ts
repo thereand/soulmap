@@ -1,5 +1,5 @@
 /**
- * 灵魂星图 - 订阅消息授权组合式函数
+ * 人格星图 - 订阅消息授权组合式函数
  *
  * 封装 wx.requestSubscribeMessage 逻辑：
  *  - 弹窗请求授权（reportExpire + friendDynamic 两个模板）

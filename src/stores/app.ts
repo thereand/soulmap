@@ -1,5 +1,5 @@
 /**
- * 灵魂星图 - 全局应用状态 Store
+ * 人格星图 - 全局应用状态 Store
  * 管理全局配置、系统状态、分享数据等
  */
 import { defineStore } from 'pinia'

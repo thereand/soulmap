@@ -1,5 +1,5 @@
 /**
- * 灵魂星图 - 测试流程引擎组合式函数
+ * 人格星图 - 测试流程引擎组合式函数
  *
  * 管理完整的 36 题答题流程，包括：
  * - 题目加载与导航
@@ -164,7 +164,7 @@ export function useTestEngine() {
   const activeDialogue = ref<typeof guideDialogues[0] | null>(null)
   const isDialogueActive = ref(false)
 
-  /** 灵魂共鸣动画状态 */
+  /** 人格共鸣动画状态 */
   const resonanceGuide = ref<GuideId | null>(null)
   const showResonance = ref(false)
 
@@ -578,7 +578,7 @@ export function useTestEngine() {
   }
 
   /**
-   * 灵魂共鸣检测
+   * 人格共鸣检测
    * 章节结束时，检查该章节内向导亲和度增量是否达到阈值
    */
   function checkSoulResonance(chapterId: string): void {
@@ -607,7 +607,7 @@ export function useTestEngine() {
   }
 
   /**
-   * 确认灵魂共鸣动画已完成
+   * 确认人格共鸣动画已完成
    */
   function confirmResonance(): void {
     showResonance.value = false

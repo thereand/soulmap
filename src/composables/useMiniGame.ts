@@ -4,7 +4,7 @@
  * 在章节过渡时随机触发小游戏，完成后发放奖励（向导亲和度 bonus 等）。
  * 支持 4 种游戏类型：
  *   - energy-collect  能量收集（ch3→ch4）
- *   - soul-puzzle     灵魂碎片拼图（ch3→ch4）
+ *   - soul-puzzle     人格碎片拼图（ch3→ch4）
  *   - guide-pick      向导选择（ch4→ch5）
  *   - star-sequence   星图点亮（ch4→ch5）
  */
@@ -17,7 +17,7 @@ export type MiniGameId = 'energy-collect' | 'soul-puzzle' | 'guide-pick' | 'star
 export interface MiniGameReward {
   /** 各向导亲和度加成 */
   guideBonus?: Record<string, number>
-  /** 灵魂碎片额外收集数 */
+  /** 人格碎片额外收集数 */
   fragmentBonus?: number
   /** 选中的向导 ID（仅 guide-pick 使用） */
   chosenGuide?: string

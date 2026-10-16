@@ -1,6 +1,6 @@
 <!--
-  灵魂星图 - 章节过场动画
-  水墨仙侠风格：境界突破 + 获得灵魂碎片 + 灵气粒子
+  人格星图 - 章节过场动画
+  水墨仙侠风格：境界突破 + 获得人格碎片 + 灵气粒子
 -->
 <template>
   <view v-if="visible" class="chapter-transition" :class="{ 'transition--active': showContent }">
@@ -38,7 +38,7 @@
         <text class="chapter-subtitle">{{ chapterSubtitle }}</text>
       </view>
 
-      <!-- 灵魂碎片 -->
+      <!-- 人格碎片 -->
       <view class="fragment-display" :class="{ 'fragment-display--show': showFragment }">
         <!-- 碎片图标 -->
         <view class="fragment-icon">
@@ -52,7 +52,7 @@
 
         <!-- 获得提示 -->
         <view class="fragment-info">
-          <text class="fragment-obtain">获得灵魂碎片</text>
+          <text class="fragment-obtain">获得人格碎片</text>
           <text class="fragment-name">{{ fragmentName }}</text>
         </view>
       </view>
@@ -245,7 +245,7 @@ onUnmounted(clearTimers)
   font-family: "STKaiti", "KaiTi", "楷体", serif;
 }
 
-/* === 灵魂碎片 === */
+/* === 人格碎片 === */
 .fragment-display {
   display: flex;
   flex-direction: column;

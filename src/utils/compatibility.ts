@@ -1,5 +1,5 @@
 /**
- * 灵魂星图 - 契合度算法
+ * 人格星图 - 契合度算法
  *
  * 融合三个维度：
  *  1. 维度距离分：同/异倾向的加权得分
@@ -51,7 +51,7 @@ export function codeToScores(code: string): CompatibilityDimensions {
 /** 关系标签映射 */
 export function relationLabelOf(score: number): string {
   if (score >= 80) return '天作之合'
-  if (score >= 60) return '灵魂知己'
+  if (score >= 60) return '人格知己'
   if (score >= 40) return '欢喜冤家'
   return '平行宇宙'
 }
