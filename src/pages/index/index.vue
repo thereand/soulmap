@@ -58,7 +58,7 @@
         <text class="footer-counter__label">位探索者已完成灵魂之旅</text>
       </view>
       <view class="footer-divider" />
-      <text class="footer-desc">5分钟 · 25道灵魂之问</text>
+      <text class="footer-desc">5分钟 · 36道灵魂之问</text>
       <text class="footer-hint">趣味人格探索，帮你更了解自己</text>
 
       <!-- 合规声明区 -->

@@ -139,6 +139,10 @@ function handleTap(index: number): void {
   }
 
   &__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
     font-size: 22px;
     line-height: 1;
     color: #ffffff;
@@ -146,6 +150,8 @@ function handleTap(index: number): void {
   }
 
   &__text {
+    width: 100%;
+    text-align: center;
     font-size: 11px;
     font-weight: 600;
     color: #ffffff;
